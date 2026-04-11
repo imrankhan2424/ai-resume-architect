@@ -1,17 +1,34 @@
-# 🚀 Resume Pipeline Prompts
-### AI-Powered Job Application Toolkit — YOUR NAME
+# 🚀 AI Resume Architect
 
-Use these prompts in **Claude**, **ChatGPT**, or **Gemini**.
-Each prompt is self-contained — paste the relevant markdown content where indicated.
+AI-Powered application to streamline your job application pipeline with a sleek, premium, visually rich UI. 
+
+Use this tool to automatically optimize your resume for ATS tracking systems using high-fidelity markdown, tailor prompts intelligently via contextual AI mapping, and render PDF exports with clean typesetting in real-time.
 
 ---
 
-## 📁 Files in This Kit
+## 🏗️ Project Architecture & Dependency Graph
+
+To optimize token usage and help AI coding assistants map our project properly, we have mapped out the *Dependency Graph* and provided full file descriptions in a dedicated Architecture file.
+
+**[View Application Architecture & Dependency Graph](ARCHITECTURE.md)**
+
+This document details:
+- A `mermaid.js` map of component imports
+- Role descriptions for `App.jsx`, Context providers, and utility components.
+- State mappings and Configuration files.
+
+---
+
+## 📁 Legacy Pipeline Prompts Files
+
+If you are looking for the original, non-web-app utility files:
 
 | File | Purpose |
 |---|---|
 | `Legacy_Resume_Formatted.md` | Full resume with emojis & visual structure |
 | `Legacy_Resume_Content_Only.md` | Plain text resume for ATS optimization |
+| `Resume_Pipeline_Prompts.html` | Original prompt kit as a basic browser page |
+| `md_to_pdf.py` | Legacy Python script to convert .md → PDF |
 | `Resume_Pipeline_Prompts.html` | This prompt kit as a browser page with copy buttons |
 | `md_to_pdf.py` | Python script to convert .md → PDF |
 

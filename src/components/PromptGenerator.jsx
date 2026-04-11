@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Copy, Check, MessageSquare, Briefcase, Zap } from 'lucide-react';
+import { Copy, Check, MessageSquare, Briefcase, Sparkles } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
+import clsx from 'clsx';
 
 const PromptGenerator = () => {
   const { mode, resumes, jobDescription, setJobDescription } = useResume();
@@ -63,52 +64,94 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
   const handleCopy = () => {
     navigator.clipboard.writeText(assemblePrompt());
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2200);
   };
 
+  const modeBadge = mode === 'ats'
+    ? { label: 'ATS Mode', color: 'badge badge-emerald' }
+    : { label: 'Visual Mode', color: 'badge badge-accent' };
+
   return (
-    <div className="space-y-6">
-      <div className="glass-card p-6">
-        <label className="flex items-center gap-2 text-sm font-semibold mb-3">
-          <Briefcase size={16} className="text-indigo-400" />
-          Job Description
-        </label>
+    <div className="space-y-4">
+
+      {/* ── Job Description Input ─────────────────── */}
+      <div className="glass-card p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'var(--accent-soft)' }}>
+              <Briefcase size={14} style={{ color: 'var(--accent)' }} />
+            </div>
+            <span className="section-label">Target Role Details</span>
+          </div>
+          <span className="badge badge-accent">Required</span>
+        </div>
+
         <textarea
+          id="job-description"
           value={jobDescription}
           onChange={(e) => setJobDescription(e.target.value)}
-          placeholder="Paste the job description here to tailor your resume..."
-          className="w-100 min-h-[200px] bg-black/20 border border-white/5 rounded-xl p-4 text-sm font-medium focus:outline-none focus:border-indigo-500/50 transition-colors"
+          placeholder="Paste the full job description here — role, requirements, tech stack, company culture…"
+          className="input-base min-h-[160px]"
         />
+
+        <p className="mt-2.5 text-[10.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
+          The more complete the job description, the better the AI alignment.
+        </p>
       </div>
 
-      <div className="glass-card p-6 border-t-4 border-t-indigo-500">
-        <div className="flex items-center justify-between mb-4">
-          <label className="flex items-center gap-2 text-sm font-semibold">
-            <Zap size={16} className="text-yellow-400" />
-            Generated Prompt ({mode.toUpperCase()})
-          </label>
-          <button
-            onClick={handleCopy}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              copied ? 'bg-green-500 text-white' : 'bg-white/5 hover:bg-white/10 text-muted hover:text-white'
-            }`}
-          >
-            {copied ? <Check size={14} /> : <Copy size={14} />}
-            {copied ? 'Copied!' : 'Copy Prompt'}
-          </button>
+      {/* ── Generated Prompt Output ───────────────── */}
+      <div className="glass-card overflow-hidden bg-transparent">
+        {/* Header bar */}
+        <div className="px-5 pt-5 pb-4 border-b" style={{ borderColor: 'var(--glass-border)' }}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'rgba(217,119,6,0.1)' }}>
+                  <Sparkles size={14} color="#d97706" />
+                </div>
+                <span className="section-label">AI Pipeline Prompt</span>
+              </div>
+              <div className="flex items-center gap-2 ml-9">
+                <span className={modeBadge.color}>{modeBadge.label}</span>
+                <span className="text-[9.5px] font-medium" style={{ color: 'var(--text-muted)' }}>— ready to copy</span>
+              </div>
+            </div>
+
+            <button
+              id="copy-prompt"
+              onClick={handleCopy}
+              className={clsx(
+                "btn h-9 px-4 text-xs transition-all duration-300",
+                copied ? "btn-emerald" : "btn-primary"
+              )}
+            >
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+              <span>{copied ? 'Copied!' : 'Copy Prompt'}</span>
+            </button>
+          </div>
         </div>
-        
-        <div className="relative group">
-          <pre className="bg-black/40 rounded-xl p-6 text-xs font-mono text-gray-400 overflow-x-auto max-h-[400px] whitespace-pre-wrap leading-relaxed">
-            {assemblePrompt()}
-          </pre>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none opacity-50 group-hover:opacity-0 transition-opacity" />
+
+        {/* Code preview */}
+        <div className="p-5">
+          <div className="relative group">
+            {/* Glow ring on hover */}
+            <div className="absolute -inset-px rounded-[1.25rem] bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ backgroundImage: 'linear-gradient(to bottom right, rgba(124,58,237,0.2), rgba(99,102,241,0.1))' }} />
+            <pre className="code-block h-[300px]">{assemblePrompt()}</pre>
+            {/* Fade-out bottom overlay */}
+            <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t rounded-b-[1.25rem] pointer-events-none opacity-80" style={{ backgroundImage: 'linear-gradient(to top, var(--bg-secondary), transparent)' }} />
+          </div>
+
+          {/* Tip footer */}
+          <div className="mt-4 flex items-start gap-2.5 p-3 rounded-lg border" style={{ background: 'var(--accent-soft)', borderColor: 'var(--glass-border)' }}>
+            <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5" style={{ background: 'rgba(255,255,255,0.1)' }}>
+              <MessageSquare size={12} style={{ color: 'var(--accent)' }} />
+            </div>
+            <p className="text-[10.5px] font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              Copy the prompt above and paste it into your preferred LLM (ChatGPT, Claude, Gemini).
+              The prompt is pre-configured for <strong>{mode.toUpperCase()}</strong> resume architecture.
+            </p>
+          </div>
         </div>
-        
-        <p className="mt-4 text-[11px] text-muted flex items-center gap-2 uppercase tracking-widest font-bold">
-          <MessageSquare size={12} />
-          Paste this into Claude, ChatGPT, or Gemini
-        </p>
       </div>
     </div>
   );

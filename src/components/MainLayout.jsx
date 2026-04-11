@@ -1,53 +1,86 @@
 import React from 'react';
-import Header from './Header';
 import PromptGenerator from './PromptGenerator';
 import PDFExport from './PDFExport';
-import { useResume } from '../context/ResumeContext';
-import { Settings, Info, ArrowRight } from 'lucide-react';
+import { Zap } from 'lucide-react';
+
+const TipItem = ({ number, children }) => (
+  <li className="flex gap-3 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+    <span className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+      {number}
+    </span>
+    <span>{children}</span>
+  </li>
+);
+
+const SectionHeader = ({ step, stepClass, title, subtitle }) => (
+  <div className="flex items-center gap-3.5 mb-6 no-print">
+    <div className={`step-indicator ${stepClass}`}>{step}</div>
+    <div>
+      <h2 className="text-lg font-bold tracking-tight">{title}</h2>
+      <p className="text-xs mt-0.5 font-medium" style={{ color: 'var(--text-muted)' }}>{subtitle}</p>
+    </div>
+  </div>
+);
 
 const MainLayout = () => {
-  const { mode } = useResume();
-
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* Left Column: Input & Prompt */}
-        <div className="space-y-8 animate-fade-in no-print" style={{ animationDelay: '0.1s' }}>
+    <main className="min-h-screen px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto pt-[120px] pb-[80px]">
+      <div className="main-grid">
+
+        {/* ── Left Column: Configure ─────────────────────── */}
+        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.05s' }}>
+
           <section>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-sm">1</span>
-              <h2 className="text-xl font-bold">Configure Pipeline</h2>
-            </div>
+            <SectionHeader
+              step="01"
+              stepClass="step-indicator-violet"
+              title="Configure Pipeline"
+              subtitle="Tailor your resume to the target role"
+            />
             <PromptGenerator />
           </section>
 
-          <footer className="pt-8 border-t border-white/5 opacity-50">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] mb-2">
-              <Info size={14} />
-              Tips for success
+          {/* Tips card */}
+          <div className="glass-card p-5 no-print" style={{ borderTop: '2px solid rgba(124,58,237,0.25)' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: 'var(--accent-soft)' }}>
+                <Zap size={13} style={{ color: 'var(--accent)' }} />
+              </div>
+              <span className="text-[10px] font-bold uppercase" style={{ letterSpacing: '0.18em', color: 'var(--accent)' }}>
+                Pro Tips
+              </span>
             </div>
-            <ul className="space-y-2 text-xs text-muted">
-              <li>• Use **Claude 3.5 Sonnet** or **GPT-4o** for the best tailoring results.</li>
-              <li>• Ensure the job description is pasted in full for maximum keyword matching.</li>
-              <li>• Review the AI output and make minor tweaks in the editor if necessary.</li>
+
+            <ul className="space-y-3">
+              <TipItem number="1">
+                Use <strong>Claude Sonnet</strong> or <strong>GPT-4o</strong> for the best results.
+              </TipItem>
+              <TipItem number="2">
+                Paste the <strong>full job description</strong> including tech stack and requirements.
+              </TipItem>
+              <TipItem number="3">
+                Paste the AI result into the <strong>editor on the right</strong> to preview & export.
+              </TipItem>
             </ul>
-          </footer>
+          </div>
+
         </div>
 
-        {/* Right Column: Preview & Export */}
-        <div className="space-y-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        {/* ── Right Column: Preview & Export ────────────── */}
+        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.15s' }}>
           <section>
-            <div className="flex items-center gap-2 mb-4 no-print">
-              <span className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">2</span>
-              <h2 className="text-xl font-bold">Preview & Export</h2>
-            </div>
+            <SectionHeader
+              step="02"
+              stepClass="step-indicator-emerald"
+              title="Preview & Export"
+              subtitle="Review and download as PDF"
+            />
             <PDFExport />
           </section>
         </div>
 
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -1,16 +1,26 @@
 import React from 'react';
-import { Sun, Moon, Briefcase, FileText, Layout, List } from 'lucide-react';
+import { Sun, Moon, Sparkles, Layout, List } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
+import clsx from 'clsx';
 
 export const ThemeToggle = () => {
   const { theme, setTheme } = useResume();
+  const isDark = theme === 'dark';
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="p-2 rounded-full hover:bg-white/10 transition-colors"
-      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      id="theme-toggle"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      className="w-10 h-10 flex items-center justify-center rounded-xl border transition-all duration-300 no-print hover:scale-105 active:scale-95"
+      style={{
+        background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.6)',
+        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'var(--border)',
+      }}
     >
-      {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+      {isDark
+        ? <Sun size={17} className="text-amber-400" />
+        : <Moon size={17} style={{ color: '#7c3aed' }} />
+      }
     </button>
   );
 };
@@ -18,50 +28,73 @@ export const ThemeToggle = () => {
 export const ModeSwitcher = () => {
   const { mode, setMode } = useResume();
   return (
-    <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
-      <button
-        onClick={() => setMode('visual')}
-        className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-          mode === 'visual'
-            ? 'bg-indigo-500 text-white shadow-lg'
-            : 'text-gray-400 hover:text-white'
-        }`}
-      >
-        <Layout size={16} />
-        Visual
-      </button>
-      <button
-        onClick={() => setMode('ats')}
-        className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-          mode === 'ats'
-            ? 'bg-indigo-500 text-white shadow-lg'
-            : 'text-gray-400 hover:text-white'
-        }`}
-      >
-        <List size={16} />
-        ATS Friendly
-      </button>
+    <div
+      className="flex p-1 rounded-xl no-print"
+      style={{
+        background: 'var(--bg-tertiary)',
+        border: '1px solid var(--glass-border)',
+      }}
+    >
+      {[
+        { key: 'visual', icon: <Layout size={14} />, label: 'Visual' },
+        { key: 'ats',    icon: <List   size={14} />, label: 'ATS'    },
+      ].map(({ key, icon, label }) => (
+        <button
+          key={key}
+          id={`mode-${key}`}
+          onClick={() => setMode(key)}
+          className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200"
+          style={{
+            background: mode === key ? 'var(--bg-secondary)' : 'transparent',
+            color: mode === key ? 'var(--accent)' : 'var(--text-muted)',
+            boxShadow: mode === key ? 'var(--shadow-sm)' : 'none',
+          }}
+        >
+          {icon}
+          {label}
+        </button>
+      ))}
     </div>
   );
 };
 
 const Header = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between glass-card !rounded-t-none !border-x-0 !border-t-0">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <Briefcase className="text-white" size={24} />
-        </div>
-        <div>
-          <h1 className="text-lg font-bold leading-none">AI Resume Architect</h1>
-          <p className="text-xs text-muted font-medium uppercase tracking-wider mt-1">Senior Optimization Kit</p>
-        </div>
-      </div>
+    <header className="fixed top-0 left-0 right-0 z-50 no-print">
+      {/* Frosted glass backdrop */}
+      <div
+        className="absolute inset-0 backdrop-blur-2xl"
+        style={{
+          background: 'var(--glass)',
+          borderBottom: '1px solid var(--glass-border)',
+        }}
+      />
 
-      <div className="flex items-center gap-6">
-        <ModeSwitcher />
-        <div className="h-6 w-px bg-white/10" />
-        <ThemeToggle />
+      <div className="max-w-[1400px] mx-auto px-6 h-16 relative flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center gap-3 group cursor-default select-none">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-105"
+               style={{ boxShadow: '0 4px 14px rgba(124,58,237,0.35)' }}>
+            <Sparkles className="text-white" size={17} />
+          </div>
+          <div>
+            <h1 className="text-base font-bold leading-tight tracking-tight">
+              Resume <span className="text-gradient">Architect</span>
+            </h1>
+            <p className="text-[9px] uppercase font-bold" style={{ letterSpacing: '0.22em', color: 'var(--text-muted)' }}>
+              AI-Powered Optimizer
+            </p>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center gap-4">
+          <div className="hidden md:block">
+            <ModeSwitcher />
+          </div>
+          <div className="w-px h-6 no-print hidden md:block" style={{ background: 'var(--border)' }} />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
