@@ -4,7 +4,7 @@ import PDFExport from './PDFExport';
 import { Zap } from 'lucide-react';
 
 const TipItem = ({ number, children }) => (
-  <li className="flex gap-3 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+  <li className="flex gap-3 leading-relaxed" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
     <span className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
       {number}
     </span>
@@ -13,7 +13,7 @@ const TipItem = ({ number, children }) => (
 );
 
 const SectionHeader = ({ step, stepClass, title, subtitle }) => (
-  <div className="flex items-center gap-3.5 mb-6 no-print">
+  <div className="flex items-center gap-4 no-print" style={{ marginBottom: '2rem' }}>
     <div className={`step-indicator ${stepClass}`}>{step}</div>
     <div>
       <h2 className="text-lg font-bold tracking-tight">{title}</h2>
@@ -24,11 +24,39 @@ const SectionHeader = ({ step, stepClass, title, subtitle }) => (
 
 const MainLayout = () => {
   return (
-    <main className="min-h-screen px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto pt-[120px] pb-[80px]">
+    <main
+      style={{
+        minHeight: '100vh',
+        maxWidth: '1440px',
+        margin: '0 auto',
+        width: '100%',
+        paddingTop: '88px',
+        paddingBottom: '80px',
+        paddingLeft:  'clamp(1.25rem, 4vw, 4rem)',
+        paddingRight: 'clamp(1.25rem, 4vw, 4rem)',
+      }}
+    >
+      {/* ── Page intro strip ──────────────────────────── */}
+      <div className="no-print" style={{ marginBottom: '3rem', paddingTop: '2rem' }}>
+        <p
+          className="text-xs font-bold uppercase tracking-widest mb-2"
+          style={{ color: 'var(--text-muted)', letterSpacing: '0.2em' }}
+        >
+          AI Resume Architect
+        </p>
+        <h2
+          className="text-2xl sm:text-3xl font-extrabold tracking-tight"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          Tailor your resume,{' '}
+          <span className="text-gradient">land the interview.</span>
+        </h2>
+      </div>
+
       <div className="main-grid">
 
         {/* ── Left Column: Configure ─────────────────────── */}
-        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.05s' }}>
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', animationDelay: '0.05s' }}>
 
           <section>
             <SectionHeader
@@ -41,8 +69,8 @@ const MainLayout = () => {
           </section>
 
           {/* Tips card */}
-          <div className="glass-card p-5 no-print" style={{ borderTop: '2px solid rgba(124,58,237,0.25)' }}>
-            <div className="flex items-center gap-2 mb-4">
+          <div className="glass-card no-print" style={{ padding: '1.75rem', borderTop: '2px solid rgba(124,58,237,0.25)' }}>
+            <div className="flex items-center gap-2" style={{ marginBottom: '1.25rem' }}>
               <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: 'var(--accent-soft)' }}>
                 <Zap size={13} style={{ color: 'var(--accent)' }} />
               </div>
@@ -51,7 +79,7 @@ const MainLayout = () => {
               </span>
             </div>
 
-            <ul className="space-y-3">
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <TipItem number="1">
                 Use <strong>Claude Sonnet</strong> or <strong>GPT-4o</strong> for the best results.
               </TipItem>
@@ -59,7 +87,7 @@ const MainLayout = () => {
                 Paste the <strong>full job description</strong> including tech stack and requirements.
               </TipItem>
               <TipItem number="3">
-                Paste the AI result into the <strong>editor on the right</strong> to preview & export.
+                Paste the AI result into the <strong>editor on the right</strong> to preview &amp; export.
               </TipItem>
             </ul>
           </div>
@@ -67,7 +95,7 @@ const MainLayout = () => {
         </div>
 
         {/* ── Right Column: Preview & Export ────────────── */}
-        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.15s' }}>
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', animationDelay: '0.15s' }}>
           <section>
             <SectionHeader
               step="02"

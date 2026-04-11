@@ -9,11 +9,11 @@ const PDFExport = () => {
   const handlePrint = () => window.print();
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-      {/* ── Editor Section ────────────────────────── */}
-      <div className="glass-card p-5">
-        <div className="flex items-center justify-between mb-4">
+      {/* ── Editor Section (hidden in print) ──────── */}
+      <div className="glass-card no-print" style={{ padding: '1.75rem' }}>
+        <div className="flex items-center justify-between" style={{ marginBottom: '1.25rem' }}>
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'var(--emerald-soft)' }}>
               <Edit3 size={14} style={{ color: 'var(--emerald)' }} />
@@ -33,11 +33,12 @@ const PDFExport = () => {
           value={aiResult}
           onChange={(e) => setAiResult(e.target.value)}
           placeholder="Paste the tailored Markdown resume from your AI here to preview and export as PDF…"
-          className="input-base input-emerald min-h-[140px]"
+          className="input-base input-emerald"
+          style={{ minHeight: '140px' }}
         />
 
         {aiResult && (
-          <div className="mt-4 flex flex-col sm:flex-row items-center gap-3 no-print">
+          <div className="mt-4 flex flex-col sm:flex-row items-center gap-3">
             <button
               id="generate-pdf"
               onClick={handlePrint}
@@ -48,7 +49,7 @@ const PDFExport = () => {
             </button>
             <div className="flex items-center gap-2 text-[10.5px] font-medium px-3 py-2 rounded-lg border" style={{ color: 'var(--emerald)', background: 'var(--emerald-soft)', borderColor: 'rgba(5,150,105,0.15)' }}>
               <Settings size={12} />
-              In the print dialog, choose <strong>&ldquo;Save as PDF&rdquo;</strong>
+              In the print dialog, choose <strong>&ldquo;Save as PDF&rdquo;</strong> and <strong>Margins: Default</strong>
             </div>
           </div>
         )}
@@ -64,14 +65,20 @@ const PDFExport = () => {
           </span>
         </div>
 
-        {/* Preview container */}
-        <div className="glass-card overflow-hidden p-3 sm:p-5 md:p-8" style={{ background: 'rgba(0,0,0,0.1)' }}>
+        {/* Preview container — the outer wrapper hides in print, the inner .print-resume shows */}
+        <div className="glass-card overflow-hidden print-preview-wrapper" style={{ padding: 'clamp(0.75rem, 2vw, 2rem)', background: 'rgba(0,0,0,0.06)' }}>
           <div
-            className={`document-skin shadow-2xl min-h-[11in] w-full max-w-[8.5in] mx-auto overflow-hidden transition-all duration-500 bg-white text-black ${
+            id="resume-print-area"
+            className={`print-resume shadow-2xl w-full mx-auto overflow-hidden transition-all duration-500 bg-white text-black ${
               mode === 'ats' ? 'font-serif' : 'font-sans'
             }`}
+            style={{ maxWidth: '8.5in', minHeight: '11in' }}
           >
-            <div className="p-[0.4in] sm:p-[0.6in] md:p-[0.7in]">
+            <div style={{ 
+              padding: 'clamp(0.4in, 3vw, 0.7in)', 
+              boxDecorationBreak: 'clone', 
+              WebkitBoxDecorationBreak: 'clone' 
+            }}>
               <ReactMarkdown className="markdown-render">
                 {aiResult || '### Layout Preview\nYour generated resume content will render here with precise typesetting for PDF export.'}
               </ReactMarkdown>
@@ -81,17 +88,19 @@ const PDFExport = () => {
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .document-skin {
+        /* ── Document skin ──────────────────────── */
+        .print-resume {
           font-variant-ligatures: common-ligatures;
           text-rendering: optimizeLegibility;
           transform-origin: top center;
           transition: transform 0.3s ease;
+          border-radius: 0.5rem;
         }
-        .document-skin:hover { transform: scale(1.005); }
+        .print-resume:hover { transform: scale(1.003); }
 
-        /* Typography for PDF Preview */
+        /* ── Typography for PDF Preview ─────────── */
         .markdown-render {
-          color: #1e1b4b; /* dark slate to ensure high contrast even if parent is dark mode */
+          color: #1e1b4b;
         }
         .markdown-render h1 {
           font-size: 24pt;
@@ -110,6 +119,8 @@ const PDFExport = () => {
           letter-spacing: 0.05em;
           font-weight: 700;
           color: #4c1d95;
+          page-break-after: avoid;
+          break-after: avoid;
         }
         .markdown-render h3 {
           font-size: 10.5pt;
@@ -117,22 +128,35 @@ const PDFExport = () => {
           margin-bottom: 1pt;
           font-weight: 700;
           color: #1e1b4b;
+          page-break-after: avoid;
+          break-after: avoid;
         }
         .markdown-render p {
           font-size: 9.5pt;
           margin-bottom: 4pt;
           color: #374151;
           line-height: 1.5;
+          page-break-inside: avoid;
+          break-inside: avoid;
+        }
+        /* Lock company subheader to the bullet list that follows it */
+        .markdown-render h3 + p {
+          page-break-after: avoid;
+          break-after: avoid;
         }
         .markdown-render ul {
           margin-bottom: 6pt;
-          padding-left: 12pt;
+          padding-left: 14pt;
+          list-style-type: disc;
         }
         .markdown-render li {
           font-size: 9.5pt;
           margin-bottom: 2pt;
           color: #374151;
           line-height: 1.45;
+          display: list-item;
+          page-break-inside: avoid;
+          break-inside: avoid;
         }
         .markdown-render strong {
           color: #1e1b4b;
@@ -148,29 +172,78 @@ const PDFExport = () => {
           text-decoration: none;
         }
 
+        /* ── Print Styles ──────────────────────── */
         @media print {
-          @page { size: A4; margin: 0; }
+          @page {
+            size: A4;
+            margin: 0;
+          }
+
           body {
             background: white !important;
             margin: 0 !important;
             padding: 0 !important;
           }
-          .no-print { display: none !important; }
-          .document-skin {
-            width: 100% !important;
-            max-width: none !important;
-            box-shadow: none !important;
-            transform: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
+
+          /* Hide the header, background orbs, and all no-print elements */
+          header,
+          .app-bg,
+          .no-print {
+            display: none !important;
           }
-          body > #root > div > main > div > div:nth-child(2) > section > div > div.relative > div.glass-card {
+
+          /* Hide the entire left column (PromptGenerator + Tips) */
+          .main-grid > div:first-child {
+            display: none !important;
+          }
+
+          /* Remove all layout constraints on the right column */
+          .main-grid {
+            display: block !important;
+          }
+
+          .main-grid > div:last-child {
+            display: block !important;
+          }
+
+          /* Hide the section header (02 Preview & Export) */
+          .main-grid > div:last-child > section > div:first-child {
+            display: none !important;
+          }
+
+          /* Hide the editor card (textarea) */
+          .main-grid > div:last-child > section > div > div.glass-card.no-print {
+            display: none !important;
+          }
+
+          /* Remove the glass card wrapper styling around the preview */
+          .print-preview-wrapper {
             background: transparent !important;
             border: none !important;
             padding: 0 !important;
+            box-shadow: none !important;
             backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
           }
-          header, .no-print, .glass-card > div:first-child { display: none !important; }
+
+          /* Make the resume fill the page */
+          #resume-print-area {
+            width: 100% !important;
+            max-width: none !important;
+            min-height: auto !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            transform: none !important;
+            margin: 0 !important;
+            background: white !important;
+          }
+
+          /* Remove the main container padding */
+          main {
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: none !important;
+          }
         }
       `}} />
     </div>

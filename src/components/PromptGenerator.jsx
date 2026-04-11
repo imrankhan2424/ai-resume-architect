@@ -20,15 +20,25 @@ I will give you:
 
 Your task:
 - Rewrite the resume to maximize ATS compatibility and keyword match
+- Keep the language highly professional and tailored to ensure it passes both ATS scanners with a high score and impresses HR reviewers
 - Mirror exact keywords, phrases, and terminology from the job description
 - Use simple, clean Markdown only: headers (##), bullet points (-), plain text
+- The system will directly parse your Markdown using ReactMarkdown and print it as a structured PDF
+- For bullets to parse correctly, you MUST leave an empty line before starting any bulleted list (- )
+- Keep "Technical Skills" as categorized bullet points (e.g., - **Automation:** Selenium...)
+- Condense "Expertise" and "Core Competencies" into a single succinct "Key Skills" section
+- Format Key Skills inline separated by pipes (e.g., Skill 1 | Skill 2 | Skill 3) to save vertical space
 - Do NOT use tables, emojis, icons, columns, or any special characters
 - Strengthen bullet points using the CAR format (Challenge → Action → Result)
 - Add a "Key Skills" or "Summary" section at the top if it improves ATS scoring
 - Do NOT invent any experience, tools, certifications, or metrics
 - Ensure job titles, company names, and dates remain exactly as provided
+- ALL company experiences MUST be presented in bullet-point format (-)
+- Constrain the total length so the generated resume fits perfectly within two A4 pages
+- If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
+- If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit
 
-Return ONLY the updated plain Markdown resume. No explanations.
+- Return ONLY the updated plain Markdown resume in a single .md compatible code block. No explanations or conversational text.
 
 --- MY RESUME ---
 ${resumeText}
@@ -45,14 +55,23 @@ I will give you:
 
 Your task:
 - Rewrite bullet points to align with the job description requirements
+- Keep the language highly professional and tailored to ensure it passes both ATS scanners with a high score and impresses HR reviewers
 - Use strong action verbs and quantifiable achievements where possible
 - Add relevant keywords from the job description naturally into the content
+- The system will directly parse your Markdown using ReactMarkdown and print it as a structured PDF
+- For bullets to parse correctly, you MUST leave an empty line before starting any bulleted list (- )
 - Do NOT invent any experience, tools, or metrics that are not already in the resume
-- Do NOT change the structure, sections, headings, or emoji icons
+- Keep "Technical Skills" as categorized bullet points (e.g., - **Automation:** Selenium...)
+- Condense "Expertise" and "Core Competencies" into a single succinct "Key Skills" section formatted inline (Skill 1 | Skill 2 | Skill 3) to save vertical space
+- Do NOT change the overall structure, headings, or emoji icons except to save space as requested
 - Do NOT remove any sections
 - Keep the output in the same Markdown format
+- ALL company experiences MUST be presented in bullet-point format (-)
+- Constrain the total length so the generated resume fits perfectly within two A4 pages
+- If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
+- If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit
 
-Return ONLY the updated Markdown resume. No explanations.
+- Return ONLY the updated Markdown resume in a single .md compatible code block. No explanations or conversational text.
 
 --- MY RESUME ---
 ${resumeText}
@@ -75,8 +94,8 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
     <div className="space-y-4">
 
       {/* ── Job Description Input ─────────────────── */}
-      <div className="glass-card p-5">
-        <div className="flex items-center justify-between mb-4">
+      <div className="glass-card" style={{ padding: '1.75rem' }}>
+        <div className="flex items-center justify-between" style={{ marginBottom: '1.25rem' }}>
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'var(--accent-soft)' }}>
               <Briefcase size={14} style={{ color: 'var(--accent)' }} />
@@ -91,18 +110,19 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
           value={jobDescription}
           onChange={(e) => setJobDescription(e.target.value)}
           placeholder="Paste the full job description here — role, requirements, tech stack, company culture…"
-          className="input-base min-h-[160px]"
+          className="input-base"
+          style={{ minHeight: '200px' }}
         />
 
-        <p className="mt-2.5 text-[10.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
+        <p className="mt-3 text-[10.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
           The more complete the job description, the better the AI alignment.
         </p>
       </div>
 
       {/* ── Generated Prompt Output ───────────────── */}
-      <div className="glass-card overflow-hidden bg-transparent">
+      <div className="glass-card overflow-hidden">
         {/* Header bar */}
-        <div className="px-5 pt-5 pb-4 border-b" style={{ borderColor: 'var(--glass-border)' }}>
+        <div className="border-b" style={{ padding: '1.5rem 1.75rem 1.25rem', borderColor: 'var(--glass-border)' }}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-1">
               <div className="flex items-center gap-2">

@@ -70,7 +70,7 @@ const Header = () => {
         }}
       />
 
-      <div className="max-w-[1400px] mx-auto px-6 h-16 relative flex items-center justify-between">
+      <div style={{ maxWidth: '1440px', margin: '0 auto', paddingLeft: 'clamp(1.25rem, 4vw, 4rem)', paddingRight: 'clamp(1.25rem, 4vw, 4rem)' }} className="h-16 relative flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-3 group cursor-default select-none">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-105"
