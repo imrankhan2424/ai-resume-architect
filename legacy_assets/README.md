@@ -10,8 +10,8 @@ Each prompt is self-contained — paste the relevant markdown content where indi
 
 | File | Purpose |
 |---|---|
-| `Legacy_Resume_Formatted.md` | Full resume with emojis & visual structure |
-| `Legacy_Resume_Content_Only.md` | Plain text resume for ATS optimization |
+| `Imran_Khan_Resume_Formatted.md` | Full resume with emojis & visual structure |
+| `Imran_Khan_Resume_Content_Only.md` | Plain text resume for ATS optimization |
 | `Resume_Pipeline_Prompts.html` | This prompt kit as a browser page with copy buttons |
 | `md_to_pdf.py` | Python script to convert .md → PDF |
 
@@ -20,7 +20,7 @@ Each prompt is self-contained — paste the relevant markdown content where indi
 ## ⚡ Recommended Workflow
 
 ```
-Legacy_Resume_Content_Only.md
+Imran_Khan_Resume_Content_Only.md
         ↓
 [Prompt 2] ATS Resume  →  Tailored_ATS_Resume.md
         ↓
@@ -35,7 +35,7 @@ Optional: [Prompt 1] for a visually formatted PDF version
 
 ## Prompt 1 — Tailored Resume (Format Preserved)
 
-**Use with:** `Legacy_Resume_Formatted.md`  
+**Use with:** `Imran_Khan_Resume_Formatted.md`  
 **When:** Applying to roles where a human reviews the resume and visual formatting matters.
 
 ```
@@ -57,7 +57,7 @@ Your task:
 Return ONLY the updated Markdown resume. No explanations.
 
 --- MY RESUME ---
-[PASTE Legacy_Resume_Formatted.md content here]
+[PASTE Imran_Khan_Resume_Formatted.md content here]
 
 --- JOB DESCRIPTION ---
 [PASTE the job description here]
@@ -67,7 +67,7 @@ Return ONLY the updated Markdown resume. No explanations.
 
 ## Prompt 2 — ATS-Friendly Resume
 
-**Use with:** `Legacy_Resume_Content_Only.md`  
+**Use with:** `Imran_Khan_Resume_Content_Only.md`  
 **When:** Submitting through online portals, LinkedIn Easy Apply, or any large company ATS.
 
 ```
@@ -90,7 +90,7 @@ Your task:
 Return ONLY the updated plain Markdown resume. No explanations.
 
 --- MY RESUME ---
-[PASTE Legacy_Resume_Content_Only.md content here]
+[PASTE Imran_Khan_Resume_Content_Only.md content here]
 
 --- JOB DESCRIPTION ---
 [PASTE the job description here]
@@ -197,8 +197,8 @@ if __name__ == "__main__":
     if len(sys.argv) == 3:
         md_to_pdf(sys.argv[1], sys.argv[2])
     else:
-        md_to_pdf("Legacy_Resume_Formatted.md", "Legacy_Resume_Formatted.pdf")
-        md_to_pdf("Legacy_Resume_Content_Only.md", "Legacy_Resume_ATS.pdf")
+        md_to_pdf("Imran_Khan_Resume_Formatted.md", "Imran_Khan_Resume_Formatted.pdf")
+        md_to_pdf("Imran_Khan_Resume_Content_Only.md", "Imran_Khan_Resume_ATS.pdf")
 ```
 
 ### Step 3 — Run it
@@ -211,7 +211,7 @@ python md_to_pdf.py Tailored_ATS_Resume.md Tailored_ATS_Resume.pdf
 python md_to_pdf.py Cover_Letter.md Cover_Letter.pdf
 
 # Convert formatted resume
-python md_to_pdf.py Legacy_Resume_Formatted.md Legacy_Resume.pdf
+python md_to_pdf.py Imran_Khan_Resume_Formatted.md Imran_Khan_Resume.pdf
 ```
 
 ---
