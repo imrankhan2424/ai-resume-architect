@@ -47,6 +47,39 @@ graph TD
     class index,main,css entry;
 ```
 
+## File Structure
+
+```text
+ai-resume-architect/
+├── src/
+│   ├── components/
+│   │   ├── Header.jsx
+│   │   ├── MainLayout.jsx
+│   │   ├── PDFExport.jsx
+│   │   └── PromptGenerator.jsx
+│   ├── config/
+│   │   └── defaults.json
+│   ├── context/
+│   │   └── ResumeContext.jsx
+│   ├── styles/
+│   │   └── index.css
+│   ├── App.jsx
+│   └── main.jsx
+├── legacy_assets/
+│   ├── Imran_Khan_Resume_Content_Only.md
+│   ├── Imran_Khan_Resume_Formatted.md
+│   ├── LEGACY_README.md
+│   └── Resume_Pipeline_Prompts.html
+├── ARCHITECTURE.md
+├── index.html
+├── package.json
+├── package-lock.json
+├── postcss.config.js
+├── README.md
+├── tailwind.config.js
+└── vite.config.js
+```
+
 ## File Descriptions
 
 ### Application Entry
