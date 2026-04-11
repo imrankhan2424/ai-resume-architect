@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resume Pipeline Prompts – Imran Khan</title>
+<title>Resume Pipeline Prompts – YOUR NAME</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -269,7 +269,7 @@
           <div class="card-title">Tailored Resume — Format Preserved</div>
           <div class="card-desc">Rewrites bullet points to match a job description while keeping all emojis, icons, and section structure intact.</div>
           <div class="card-meta">
-            <span class="meta-tag">Imran_Khan_Resume_Formatted.md</span>
+            <span class="meta-tag">Legacy_Resume_Formatted.md</span>
             <span class="meta-tag">+ Job Description</span>
           </div>
         </div>
@@ -304,7 +304,7 @@ Your task:
 Return ONLY the updated Markdown resume. No explanations.
 
 --- MY RESUME ---
-[PASTE Imran_Khan_Resume_Formatted.md content here]
+[PASTE Legacy_Resume_Formatted.md content here]
 
 --- JOB DESCRIPTION ---
 [PASTE the job description here]</pre>
@@ -321,7 +321,7 @@ Return ONLY the updated Markdown resume. No explanations.
           <div class="card-title">ATS-Friendly Resume</div>
           <div class="card-desc">Optimizes the plain content resume for ATS keyword matching — no icons, clean markdown, CAR-format bullet points.</div>
           <div class="card-meta">
-            <span class="meta-tag">Imran_Khan_Resume_Content_Only.md</span>
+            <span class="meta-tag">Legacy_Resume_Content_Only.md</span>
             <span class="meta-tag">+ Job Description</span>
           </div>
         </div>
@@ -357,7 +357,7 @@ Your task:
 Return ONLY the updated plain Markdown resume. No explanations.
 
 --- MY RESUME ---
-[PASTE Imran_Khan_Resume_Content_Only.md content here]
+[PASTE Legacy_Resume_Content_Only.md content here]
 
 --- JOB DESCRIPTION ---
 [PASTE the job description here]</pre>
@@ -512,8 +512,8 @@ if __name__ == "__main__":
     if len(sys.argv) == 3:
         md_to_pdf(sys.argv[1], sys.argv[2])
     else:
-        md_to_pdf("Imran_Khan_Resume_Formatted.md", "Imran_Khan_Resume_Formatted.pdf")
-        md_to_pdf("Imran_Khan_Resume_Content_Only.md", "Imran_Khan_Resume_ATS.pdf")</pre>
+        md_to_pdf("Legacy_Resume_Formatted.md", "Legacy_Resume_Formatted.pdf")
+        md_to_pdf("Legacy_Resume_Content_Only.md", "Legacy_Resume_ATS.pdf")</pre>
       </div>
 
       <div class="sub-label">Step 3 — Run it</div>
@@ -532,7 +532,7 @@ python md_to_pdf.py Tailored_ATS_Resume.md Tailored_ATS_Resume.pdf
 python md_to_pdf.py Cover_Letter.md Cover_Letter.pdf
 
 # Convert formatted resume
-python md_to_pdf.py Imran_Khan_Resume_Formatted.md Imran_Khan_Resume.pdf</pre>
+python md_to_pdf.py Legacy_Resume_Formatted.md Legacy_Resume.pdf</pre>
       </div>
     </div>
   </div>
@@ -540,7 +540,7 @@ python md_to_pdf.py Imran_Khan_Resume_Formatted.md Imran_Khan_Resume.pdf</pre>
 </div>
 
 <footer>
-  Built for <span>Imran Khan</span> · Senior Software Test Engineer · Dubai, UAE
+  Built for <span>YOUR NAME</span> · Senior Software Test Engineer · City, Country
 </footer>
 
 <script>
