@@ -60,8 +60,8 @@ graph TD
 * **`src/components/MainLayout.jsx`**: The two-column grid layout container holding the application's main functional sections.
 
 ### Feature Components
-* **`src/components/PromptGenerator.jsx`**: The left-hand panel where the user inputs the job description. It dynamically generates the optimized AI prompt based on the chosen mode (ATS or Visual) and current resume data, with a 1-click copy feature.
-* **`src/components/PDFExport.jsx`**: The right-hand panel where the user pastes the AI-generated markdown. It renders a live preview of the resume and handles the high-fidelity PDF print layout.
+* **`src/components/PromptGenerator.jsx`**: The left-hand panel where the user inputs the job description. It dynamically generates robust, independent AI prompts for BOTH the resume and an optional tailormade cover letter, with 1-click copy features, based on the active mode (ATS or Visual).
+* **`src/components/PDFExport.jsx`**: The right-hand panel where the user pastes the AI-generated markdown. It renders live previews of both documents using distinct, optimized typography for each. It features independent CSS print isolation logic for exporting the Resume, Cover Letter, or a combined PDF natively via the browser.
 
 ### Context & State
 * **`src/context/ResumeContext.jsx`**: The global state manager (using React Context). It handles persisting data to `localStorage` (theme, mode, AI results, and resume texts) so user progress isn't lost on refresh.

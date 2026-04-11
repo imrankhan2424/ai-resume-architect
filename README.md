@@ -1,246 +1,60 @@
 # 🚀 AI Resume Architect
 
-AI-Powered application to streamline your job application pipeline with a sleek, premium, visually rich UI. 
+AI-Powered job application pipeline application with a sleek, premium, visually rich UI. 
 
-Use this tool to automatically optimize your resume for ATS tracking systems using high-fidelity markdown, tailor prompts intelligently via contextual AI mapping, and render PDF exports with clean typesetting in real-time.
+Use this tool to automatically generate and format your resume for ATS tracking systems and professional human review, tailor prompts intelligently via contextual AI mapping, and render PDF exports with clean typesetting directly in your browser.
+
+---
+
+## ✨ Features
+
+- **Dual-Mode Optimization**: Toggle between ATS-friendly (clean, dense, parsable) and Visual (rich formatting) resume modes.
+- **Integrated Prompts**: No more copy-pasting from text files. The app dynamically generates exact prompts for ChatGPT/Claude based on your resume and job description.
+- **Cover Letter Engine**: Dedicated mode to generate beautiful, professional cover letters alongside your resume, with bespoke typography.
+- **Live Markdown Parsing**: Paste AI outputs back into the app and see them render instantly via `react-markdown`.
+- **1-Click PDF Export**: Built-in CSS print logic. Print your resume, cover letter, or a combined PDF directly from the browser natively, without requiring python scripts or WEasyPrint.
+- **Premium Glassmorphism UI**: Beautiful, interactive dark/light mode UI built with Tailwind CSS.
 
 ---
 
 ## 🏗️ Project Architecture & Dependency Graph
 
-To optimize token usage and help AI coding assistants map our project properly, we have mapped out the *Dependency Graph* and provided full file descriptions in a dedicated Architecture file.
+To optimize token usage and help developers map our project properly, we have mapped out the *Dependency Graph* and provided full file descriptions in a dedicated Architecture file.
 
 **[View Application Architecture & Dependency Graph](ARCHITECTURE.md)**
 
-This document details:
-- A `mermaid.js` map of component imports
-- Role descriptions for `App.jsx`, Context providers, and utility components.
-- State mappings and Configuration files.
-
 ---
 
-## 📁 Legacy Pipeline Prompts Files
+## 🚀 Getting Started
 
-If you are looking for the original, non-web-app utility files:
-
-| File | Purpose |
-|---|---|
-| `Legacy_Resume_Formatted.md` | Full resume with emojis & visual structure |
-| `Legacy_Resume_Content_Only.md` | Plain text resume for ATS optimization |
-| `Resume_Pipeline_Prompts.html` | Original prompt kit as a basic browser page |
-| `md_to_pdf.py` | Legacy Python script to convert .md → PDF |
-| `Resume_Pipeline_Prompts.html` | This prompt kit as a browser page with copy buttons |
-| `md_to_pdf.py` | Python script to convert .md → PDF |
-
----
-
-## ⚡ Recommended Workflow
-
-```
-Legacy_Resume_Content_Only.md
-        ↓
-[Prompt 2] ATS Resume  →  Tailored_ATS_Resume.md
-        ↓
-[Prompt 3] Cover Letter  →  Cover_Letter.md
-        ↓
-[Prompt 4] Python Script  →  .pdf files ✅
-
-Optional: [Prompt 1] for a visually formatted PDF version
-```
-
----
-
-## Prompt 1 — Tailored Resume (Format Preserved)
-
-**Use with:** `Legacy_Resume_Formatted.md`  
-**When:** Applying to roles where a human reviews the resume and visual formatting matters.
-
-```
-You are an expert resume optimizer.
-
-I will give you:
-1. My resume in Markdown format (with formatting, emojis, and section structure intact)
-2. A job description
-
-Your task:
-- Rewrite bullet points to align with the job description requirements
-- Use strong action verbs and quantifiable achievements where possible
-- Add relevant keywords from the job description naturally into the content
-- Do NOT invent any experience, tools, or metrics that are not already in the resume
-- Do NOT change the structure, sections, headings, or emoji icons
-- Do NOT remove any sections
-- Keep the output in the same Markdown format
-
-Return ONLY the updated Markdown resume. No explanations.
-
---- MY RESUME ---
-[PASTE Legacy_Resume_Formatted.md content here]
-
---- JOB DESCRIPTION ---
-[PASTE the job description here]
-```
-
----
-
-## Prompt 2 — ATS-Friendly Resume
-
-**Use with:** `Legacy_Resume_Content_Only.md`  
-**When:** Submitting through online portals, LinkedIn Easy Apply, or any large company ATS.
-
-```
-You are an expert ATS resume optimizer.
-
-I will give you:
-1. My resume in plain Markdown format (no icons, no heavy formatting)
-2. A job description
-
-Your task:
-- Rewrite the resume to maximize ATS compatibility and keyword match
-- Mirror exact keywords, phrases, and terminology from the job description
-- Use simple, clean Markdown only: headers (##), bullet points (-), plain text
-- Do NOT use tables, emojis, icons, columns, or any special characters
-- Strengthen bullet points using the CAR format (Challenge → Action → Result)
-- Add a "Key Skills" or "Summary" section at the top if it improves ATS scoring
-- Do NOT invent any experience, tools, certifications, or metrics
-- Ensure job titles, company names, and dates remain exactly as provided
-
-Return ONLY the updated plain Markdown resume. No explanations.
-
---- MY RESUME ---
-[PASTE Legacy_Resume_Content_Only.md content here]
-
---- JOB DESCRIPTION ---
-[PASTE the job description here]
-```
-
----
-
-## Prompt 3 — Cover Letter Generator
-
-**Run after:** Prompt 1 or Prompt 2  
-**Input:** Paste the AI's tailored resume output as the resume input below.
-
-```
-You are a professional career assistant.
-
-I will give you:
-1. My tailored resume in Markdown
-2. A job description
-3. The company name and role I am applying for
-
-Your task:
-Write a professional cover letter with:
-- A strong opening paragraph that hooks the reader
-- 2–3 body paragraphs connecting my experience to the job requirements
-- Specific achievements from my resume that match the job
-- A confident closing paragraph with a call to action
-- Professional tone — no generic filler phrases like "I am a hard worker"
-- Length: 3–4 paragraphs, no longer than one page
-- Do NOT use placeholders like [Your Name] — use my actual details from the resume
-
-Format the output in plain Markdown.
-
---- MY TAILORED RESUME ---
-[PASTE your tailored resume here]
-
---- JOB DESCRIPTION ---
-[PASTE the job description here]
-
---- APPLYING FOR ---
-Company: [Company Name]
-Role: [Job Title]
-```
-
----
-
-## Prompt 4 — Markdown → PDF Converter (Python)
-
-### Step 1 — Install dependencies
-
+**1. Install Dependencies**
 ```bash
-pip install markdown weasyprint
+npm install
 ```
 
-### Step 2 — Save as `md_to_pdf.py`
-
-```python
-import markdown
-from weasyprint import HTML
-import sys
-
-def md_to_pdf(input_md, output_pdf):
-    with open(input_md, "r", encoding="utf-8") as f:
-        md_content = f.read()
-
-    html_body = markdown.markdown(md_content, extensions=["extra", "nl2br"])
-
-    html_full = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <style>
-            body {{
-                font-family: 'Arial', sans-serif;
-                font-size: 11pt;
-                line-height: 1.5;
-                margin: 40px 50px;
-                color: #1a1a1a;
-            }}
-            h1 {{ font-size: 22pt; margin-bottom: 2px; color: #000; }}
-            h2 {{
-                font-size: 13pt;
-                border-bottom: 1px solid #ccc;
-                padding-bottom: 4px;
-                margin-top: 20px;
-                color: #2c2c2c;
-            }}
-            h3 {{ font-size: 11pt; margin-bottom: 2px; color: #000; }}
-            ul {{ margin: 4px 0; padding-left: 20px; }}
-            li {{ margin-bottom: 4px; }}
-            p {{ margin: 4px 0; }}
-            hr {{ border: none; border-top: 1px solid #ddd; margin: 14px 0; }}
-            a {{ color: #0057b8; text-decoration: none; }}
-        </style>
-    </head>
-    <body>{html_body}</body>
-    </html>
-    """
-
-    HTML(string=html_full).write_pdf(output_pdf)
-    print(f"PDF saved to: {output_pdf}")
-
-if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        md_to_pdf(sys.argv[1], sys.argv[2])
-    else:
-        md_to_pdf("Legacy_Resume_Formatted.md", "Legacy_Resume_Formatted.pdf")
-        md_to_pdf("Legacy_Resume_Content_Only.md", "Legacy_Resume_ATS.pdf")
-```
-
-### Step 3 — Run it
-
+**2. Start Development Server**
 ```bash
-# Convert ATS resume
-python md_to_pdf.py Tailored_ATS_Resume.md Tailored_ATS_Resume.pdf
+npm run dev
+```
 
-# Convert cover letter
-python md_to_pdf.py Cover_Letter.md Cover_Letter.pdf
-
-# Convert formatted resume
-python md_to_pdf.py Legacy_Resume_Formatted.md Legacy_Resume.pdf
+**3. Build for Production**
+```bash
+npm run build
 ```
 
 ---
 
-## 💡 Tips
+## ⚡ Application Workflow
 
-- **Always tailor per job** — never send the same resume twice
-- **Match the job title** in your resume summary if it's close to your current title
-- **Keep metrics** — numbers dramatically increase ATS and human review scores
-- **One page** for the cover letter, two pages max for the resume
-- **Open the HTML file** (`Resume_Pipeline_Prompts.html`) in any browser for copy buttons on every prompt
+1. Paste the target **Job Description** into the required field.
+2. Ensure the "Need Cover Letter?" toggle is enabled to generate independent prompts for both a Resume and Cover Letter.
+3. Click **Copy** on the Resume Prompt, paste it into your LLM (Claude/ChatGPT/Gemini), and copy the markdown output into the **AI Result Editor**.
+4. Repeat for the Cover Letter Prompt.
+5. Review the **Live Previews** on the right panel.
+6. Click **Print Resume**, **Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
 
 ---
 
-*Senior Software Test Engineer · City, Country · your.email@example.com*
+## 📁 Legacy Files
+
+The original prompt toolkit (`.html` and `.md` files) and the Python `weasyprint` script (`md_to_pdf.py`) have been moved to the `legacy_assets/` folder and are preserved for archive purposes.

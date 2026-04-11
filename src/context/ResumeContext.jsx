@@ -31,6 +31,8 @@ export const ResumeProvider = ({ children }) => {
   });
   const [jobDescription, setJobDescription] = useState('');
   const [aiResult, setAiResult] = useState('');
+  const [includeCoverLetter, setIncludeCoverLetter] = useState(false);
+  const [aiCoverLetterResult, setAiCoverLetterResult] = useState('');
 
   useEffect(() => {
     localStorage.setItem('resume-theme', theme);
@@ -55,7 +57,9 @@ export const ResumeProvider = ({ children }) => {
       mode, setMode,
       resumes, updateResume,
       jobDescription, setJobDescription,
-      aiResult, setAiResult
+      aiResult, setAiResult,
+      includeCoverLetter, setIncludeCoverLetter,
+      aiCoverLetterResult, setAiCoverLetterResult
     }}>
       {children}
     </ResumeContext.Provider>

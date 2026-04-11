@@ -1,18 +1,30 @@
 import React, { useState } from 'react';
-import { Copy, Check, MessageSquare, Briefcase, Sparkles } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Copy, Check, MessageSquare, Briefcase, Sparkles, FileText, Maximize2, X } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
 import clsx from 'clsx';
 
 const PromptGenerator = () => {
-  const { mode, resumes, jobDescription, setJobDescription } = useResume();
-  const [copied, setCopied] = useState(false);
+  const { mode, resumes, jobDescription, setJobDescription, includeCoverLetter, setIncludeCoverLetter } = useResume();
+  const [copiedResume, setCopiedResume] = useState(false);
+  const [copiedCover, setCopiedCover] = useState(false);
+  const [copiedJobDescription, setCopiedJobDescription] = useState(false);
+  const [modalTarget, setModalTarget] = useState(null); // 'resume' | 'cover' | null
 
-  const assemblePrompt = () => {
+  const handleCopyJobDescription = () => {
+    if (!jobDescription) return;
+    navigator.clipboard.writeText(jobDescription);
+    setCopiedJobDescription(true);
+    setTimeout(() => setCopiedJobDescription(false), 2000);
+  };
+
+  // ── Resume Prompt (reverted to original clean versions) ──────────
+  const assembleResumePrompt = () => {
     const resumeText = resumes[mode];
     const isATS = mode === 'ats';
 
-    if (isATS) {
-      return `You are an expert ATS resume optimizer.
+    const prompt = isATS
+      ? `You are an expert ATS resume optimizer.
 
 I will give you:
 1. My resume in plain Markdown format (no icons, no heavy formatting)
@@ -38,16 +50,8 @@ Your task:
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit
 
-- Return ONLY the updated plain Markdown resume in a single .md compatible code block. No explanations or conversational text.
-
---- MY RESUME ---
-${resumeText}
-
---- JOB DESCRIPTION ---
-${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
-    }
-
-    return `You are an expert resume optimizer.
+- Return ONLY the updated plain Markdown resume in a single .md compatible code block. No explanations or conversational text.`
+      : `You are an expert resume optimizer.
 
 I will give you:
 1. My resume in Markdown format (with formatting, emojis, and section structure intact)
@@ -71,7 +75,9 @@ Your task:
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit
 
-- Return ONLY the updated Markdown resume in a single .md compatible code block. No explanations or conversational text.
+- Return ONLY the updated Markdown resume in a single .md compatible code block. No explanations or conversational text.`;
+
+    return `${prompt}
 
 --- MY RESUME ---
 ${resumeText}
@@ -80,18 +86,148 @@ ${resumeText}
 ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(assemblePrompt());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2200);
+  // ── Cover Letter Prompt ─────────────────────────────────────────
+  const assembleCoverLetterPrompt = () => {
+    const resumeText = resumes[mode];
+
+    return `You are an expert cover letter writer.
+
+I will give you:
+1. My resume
+2. A job description
+
+Your task:
+- Write a professional, compelling cover letter tailored to the job description
+- The system will directly parse your Markdown using ReactMarkdown and print it as a structured PDF
+- Extract the company name, hiring manager (if available), and target role from the job description automatically
+
+STRUCTURE (follow this exact format):
+1. Start with my full name as an H1 heading (# Name)
+2. On the next line, put my contact details (phone | email | LinkedIn | location) as plain text
+3. Add a horizontal rule (---) as a visual separator
+4. Date line (e.g., April 12, 2026)
+5. If hiring manager name is found, address them. Otherwise use "Dear Hiring Manager,"
+6. Opening paragraph — hook the reader, mention the exact role and company name
+7. 2–3 body paragraphs — connect specific achievements from my resume to the job requirements. Use **bold** for key highlights
+8. Closing paragraph — confident call to action, express availability
+9. Sign off with "Warm regards," followed by my full name only (do NOT repeat contact details here)
+
+FORMATTING RULES:
+- Each paragraph must be separated by a blank line for proper Markdown parsing
+- Keep paragraphs concise — 3-4 sentences maximum per paragraph
+- Use **bold** sparingly for emphasis on core keywords from the job description, key skills, and metrics
+- Do NOT use bullet points in the letter body — write in proper letter prose
+- Professional tone — no generic filler phrases like "I am a hard worker"
+- Constrain the total length so the cover letter fits perfectly within one A4 page
+- Do NOT use tables, columns, emojis, or any special characters
+
+- Return ONLY the cover letter in a single .md compatible code block. No explanations or conversational text.
+
+--- MY RESUME ---
+${resumeText}
+
+--- JOB DESCRIPTION ---
+${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
+  };
+
+  const handleCopyResume = () => {
+    navigator.clipboard.writeText(assembleResumePrompt());
+    setCopiedResume(true);
+    setTimeout(() => setCopiedResume(false), 2200);
+  };
+
+  const handleCopyCover = () => {
+    navigator.clipboard.writeText(assembleCoverLetterPrompt());
+    setCopiedCover(true);
+    setTimeout(() => setCopiedCover(false), 2200);
   };
 
   const modeBadge = mode === 'ats'
     ? { label: 'ATS Mode', color: 'badge badge-emerald' }
     : { label: 'Visual Mode', color: 'badge badge-accent' };
 
+  // Helper: get the active modal prompt text
+  const getModalPrompt = () => modalTarget === 'cover' ? assembleCoverLetterPrompt() : assembleResumePrompt();
+  const handleModalCopy = () => {
+    navigator.clipboard.writeText(getModalPrompt());
+    if (modalTarget === 'cover') {
+      setCopiedCover(true);
+      setTimeout(() => setCopiedCover(false), 2200);
+    } else {
+      setCopiedResume(true);
+      setTimeout(() => setCopiedResume(false), 2200);
+    }
+  };
+  const isModalCopied = modalTarget === 'cover' ? copiedCover : copiedResume;
+
+  // ── Reusable Prompt Section Component ───────────────────────────
+  const PromptSection = ({ title, icon: Icon, iconColor, iconBg, badge, prompt, onCopy, copied, onExpand }) => (
+    <div className="glass-card overflow-hidden">
+      {/* Header bar */}
+      <div className="border-b" style={{ padding: '1.5rem 1.75rem 1.25rem', borderColor: 'var(--glass-border)' }}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: iconBg }}>
+                <Icon size={14} color={iconColor} />
+              </div>
+              <span className="section-label" style={{ marginBottom: 0 }}>{title}</span>
+            </div>
+            <div className="flex items-center gap-2 ml-9">
+              <span className={badge.color}>{badge.label}</span>
+              <span className="text-[9.5px] font-medium ml-2" style={{ color: 'var(--text-muted)' }}>— ready to copy</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onExpand}
+              className="btn h-9 px-3 text-xs transition-all duration-300 hover:scale-105"
+              style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+              title="View Full Prompt"
+            >
+              <Maximize2 size={14} />
+            </button>
+            <button
+              onClick={onCopy}
+              className={clsx(
+                "btn h-9 px-4 text-xs transition-all duration-300",
+                copied ? "btn-emerald" : "btn-primary"
+              )}
+            >
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+              <span>{copied ? 'Copied!' : 'Copy Prompt'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Code preview */}
+      <div className="p-5">
+        <div className="relative group">
+          {/* Glow ring on hover */}
+          <div className="absolute -inset-px rounded-[1.25rem] bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ backgroundImage: 'linear-gradient(to bottom right, rgba(124,58,237,0.2), rgba(99,102,241,0.1))' }} />
+          <pre className="code-block h-[300px]">{prompt}</pre>
+          {/* Fade-out bottom overlay */}
+          <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t rounded-b-[1.25rem] pointer-events-none opacity-80" style={{ backgroundImage: 'linear-gradient(to top, var(--bg-secondary), transparent)' }} />
+        </div>
+
+        {/* Tip footer */}
+        <div className="mt-4 flex items-start gap-2.5 p-3 rounded-lg border" style={{ background: 'var(--accent-soft)', borderColor: 'var(--glass-border)' }}>
+          <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5" style={{ background: 'rgba(255,255,255,0.1)' }}>
+            <MessageSquare size={12} style={{ color: 'var(--accent)' }} />
+          </div>
+          <p className="text-[10.5px] font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            Copy the prompt above and paste it into your preferred LLM (ChatGPT, Claude, Gemini).
+            The prompt is pre-configured for <strong>{mode.toUpperCase()}</strong> resume architecture.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
       {/* ── Job Description Input ─────────────────── */}
       <div className="glass-card" style={{ padding: '1.75rem' }}>
@@ -102,7 +238,19 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
             </div>
             <span className="section-label">Target Role Details</span>
           </div>
-          <span className="badge badge-accent">Required</span>
+          <div className="flex items-center gap-2">
+            {jobDescription && (
+              <button
+                onClick={handleCopyJobDescription}
+                className={`btn h-7 px-3 text-[10.5px] transition-all duration-300 ${copiedJobDescription ? 'btn-accent' : ''}`}
+                style={!copiedJobDescription ? { background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' } : {}}
+              >
+                {copiedJobDescription ? <Check size={12} /> : <Copy size={12} />}
+                <span>{copiedJobDescription ? 'Copied!' : 'Copy'}</span>
+              </button>
+            )}
+            <span className="badge badge-accent">Required</span>
+          </div>
         </div>
 
         <textarea
@@ -114,65 +262,112 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
           style={{ minHeight: '200px' }}
         />
 
-        <p className="mt-3 text-[10.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
-          The more complete the job description, the better the AI alignment.
-        </p>
+        <div className="mt-6 flex items-center justify-between" style={{ padding: '0 0.25rem' }}>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-semibold transition-colors duration-300" style={{ color: includeCoverLetter ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Need Cover Letter?</span>
+            <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>Adds a separate cover letter prompt section below.</span>
+          </div>
+          <button
+            onClick={() => setIncludeCoverLetter(!includeCoverLetter)}
+            className="relative flex items-center h-6 rounded-full w-11 transition-all duration-300 focus:outline-none shrink-0"
+            style={{ 
+              background: includeCoverLetter ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--border)',
+            }}
+          >
+            <span
+              className={clsx("inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md", includeCoverLetter ? "translate-x-6" : "translate-x-1")}
+            />
+          </button>
+        </div>
       </div>
 
-      {/* ── Generated Prompt Output ───────────────── */}
-      <div className="glass-card overflow-hidden">
-        {/* Header bar */}
-        <div className="border-b" style={{ padding: '1.5rem 1.75rem 1.25rem', borderColor: 'var(--glass-border)' }}>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'rgba(217,119,6,0.1)' }}>
-                  <Sparkles size={14} color="#d97706" />
+      {/* ── Resume Prompt Section ──────────────────── */}
+      <PromptSection
+        title="Resume Prompt"
+        icon={Sparkles}
+        iconColor="#d97706"
+        iconBg="rgba(217,119,6,0.1)"
+        badge={modeBadge}
+        prompt={assembleResumePrompt()}
+        onCopy={handleCopyResume}
+        copied={copiedResume}
+        onExpand={() => setModalTarget('resume')}
+      />
+
+      {/* ── Cover Letter Prompt Section (conditional) ── */}
+      {includeCoverLetter && (
+        <PromptSection
+          title="Cover Letter Prompt"
+          icon={FileText}
+          iconColor="#7c3aed"
+          iconBg="rgba(124,58,237,0.1)"
+          badge={{ label: 'Cover Letter', color: 'badge badge-accent' }}
+          prompt={assembleCoverLetterPrompt()}
+          onCopy={handleCopyCover}
+          copied={copiedCover}
+          onExpand={() => setModalTarget('cover')}
+        />
+      )}
+
+      {/* ── Full Screen Prompt Modal ───────────────── */}
+      {modalTarget && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md transition-opacity" onClick={() => setModalTarget(null)}>
+          <div 
+            className="w-full max-w-4xl max-h-[90vh] flex flex-col shadow-[0_30px_60px_rgba(0,0,0,0.5)] relative animate-in fade-in zoom-in-95 duration-200 rounded-2xl overflow-hidden border" 
+            onClick={e => e.stopPropagation()}
+            style={{ background: '#0d1117', borderColor: 'rgba(255,255,255,0.12)' }}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 px-6 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)', background: '#161b22' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: modalTarget === 'cover' ? 'rgba(124, 58, 237, 0.15)' : 'rgba(217,119,6,0.15)' }}>
+                  {modalTarget === 'cover' ? <FileText size={18} color="#c084fc" /> : <Sparkles size={18} color="#fbbf24" />}
                 </div>
-                <span className="section-label">AI Pipeline Prompt</span>
+                <div>
+                  <h3 className="font-semibold text-[15px] text-white">{modalTarget === 'cover' ? 'Cover Letter Prompt' : 'Resume Prompt'}</h3>
+                  <p className="text-[11px] text-slate-400">Ready to paste into ChatGPT or Claude</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2 ml-9">
-                <span className={modeBadge.color}>{modeBadge.label}</span>
-                <span className="text-[9.5px] font-medium" style={{ color: 'var(--text-muted)' }}>— ready to copy</span>
+              <button 
+                onClick={() => setModalTarget(null)}
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="overflow-hidden flex-1 flex flex-col relative" style={{ background: '#0d1117' }}>
+              <div className="overflow-y-auto flex-1 relative z-20">
+                <pre className="text-[13px] leading-7 font-mono whitespace-pre-wrap select-all text-slate-300" style={{ padding: '2rem 2.5rem', margin: 0, tabSize: 2 }}>{getModalPrompt()}</pre>
               </div>
+              {/* Fade out bottom overlay */}
+              <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-[#0d1117] to-transparent pointer-events-none z-30" />
             </div>
 
-            <button
-              id="copy-prompt"
-              onClick={handleCopy}
-              className={clsx(
-                "btn h-9 px-4 text-xs transition-all duration-300",
-                copied ? "btn-emerald" : "btn-primary"
-              )}
-            >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-              <span>{copied ? 'Copied!' : 'Copy Prompt'}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Code preview */}
-        <div className="p-5">
-          <div className="relative group">
-            {/* Glow ring on hover */}
-            <div className="absolute -inset-px rounded-[1.25rem] bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ backgroundImage: 'linear-gradient(to bottom right, rgba(124,58,237,0.2), rgba(99,102,241,0.1))' }} />
-            <pre className="code-block h-[300px]">{assemblePrompt()}</pre>
-            {/* Fade-out bottom overlay */}
-            <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t rounded-b-[1.25rem] pointer-events-none opacity-80" style={{ backgroundImage: 'linear-gradient(to top, var(--bg-secondary), transparent)' }} />
-          </div>
-
-          {/* Tip footer */}
-          <div className="mt-4 flex items-start gap-2.5 p-3 rounded-lg border" style={{ background: 'var(--accent-soft)', borderColor: 'var(--glass-border)' }}>
-            <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5" style={{ background: 'rgba(255,255,255,0.1)' }}>
-              <MessageSquare size={12} style={{ color: 'var(--accent)' }} />
+            {/* Modal Footer */}
+            <div className="p-4 px-6 flex justify-between items-center" style={{ background: '#161b22', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <span className="text-xs text-slate-400 flex items-center gap-2 hidden sm:flex">
+                <MessageSquare size={14} /> Paste this entire block directly into your LLM chat.
+              </span>
+              <button
+                onClick={handleModalCopy}
+                className={clsx(
+                  "btn h-10 px-6 text-sm font-semibold shadow-xl transition-all duration-300 border-0 text-white w-full sm:w-auto",
+                  isModalCopied 
+                    ? "bg-emerald-600 hover:bg-emerald-500" 
+                    : (modalTarget === 'cover' ? "bg-violet-600 hover:bg-violet-500" : "bg-amber-600 hover:bg-amber-500")
+                )}
+              >
+                {isModalCopied ? <Check size={16} /> : <Copy size={16} />}
+                <span>{isModalCopied ? 'Copied to Clipboard!' : 'Copy Prompt'}</span>
+              </button>
             </div>
-            <p className="text-[10.5px] font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Copy the prompt above and paste it into your preferred LLM (ChatGPT, Claude, Gemini).
-              The prompt is pre-configured for <strong>{mode.toUpperCase()}</strong> resume architecture.
-            </p>
           </div>
-        </div>
-      </div>
+        </div>,
+        document.body
+      )}
+
     </div>
   );
 };

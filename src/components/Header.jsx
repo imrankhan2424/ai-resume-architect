@@ -26,15 +26,30 @@ export const ThemeToggle = () => {
 };
 
 export const ModeSwitcher = () => {
-  const { mode, setMode } = useResume();
+  const { mode, setMode, theme } = useResume();
+  const isDark = theme === 'dark';
   return (
     <div
-      className="flex p-1 rounded-xl no-print"
+      className="flex p-1 rounded-[0.85rem] no-print relative"
       style={{
         background: 'var(--bg-tertiary)',
         border: '1px solid var(--glass-border)',
+        boxShadow: isDark ? 'inset 0 2px 4px rgba(0,0,0,0.4)' : 'inset 0 2px 4px rgba(0,0,0,0.02)'
       }}
     >
+      {/* Sliding background pill */}
+      <div 
+        className="absolute rounded-xl transition-all duration-300 ease-out pointer-events-none"
+        style={{
+          top: '2px',
+          bottom: '2px',
+          width: 'calc(50% - 4px)',
+          background: 'var(--bg-secondary)',
+          boxShadow: isDark ? '0 2px 12px rgba(0,0,0,0.5)' : '0 2px 8px rgba(0,0,0,0.08)',
+          left: mode === 'visual' ? '4px' : '50%',
+          border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid var(--glass-border)'
+        }}
+      />
       {[
         { key: 'visual', icon: <Layout size={14} />, label: 'Visual' },
         { key: 'ats',    icon: <List   size={14} />, label: 'ATS'    },
@@ -43,15 +58,21 @@ export const ModeSwitcher = () => {
           key={key}
           id={`mode-${key}`}
           onClick={() => setMode(key)}
-          className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200"
+          className="relative z-10 flex flex-1 items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg transition-colors duration-300"
           style={{
-            background: mode === key ? 'var(--bg-secondary)' : 'transparent',
             color: mode === key ? 'var(--accent)' : 'var(--text-muted)',
-            boxShadow: mode === key ? 'var(--shadow-sm)' : 'none',
+            fontSize: '0.8rem',
+            fontWeight: mode === key ? '700' : '600',
+            fontFamily: "'Inter', sans-serif",
+            minWidth: '95px'
           }}
         >
-          {icon}
-          {label}
+          <span style={{ transform: mode === key ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.3s' }}>
+            {icon}
+          </span>
+          <span style={{ transform: mode === key ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.3s' }}>
+            {label}
+          </span>
         </button>
       ))}
     </div>
