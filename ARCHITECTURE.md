@@ -71,7 +71,6 @@ ai-resume-architect/
 ├── package-lock.json
 ├── postcss.config.js
 ├── README.md
-├── tailwind.config.js
 └── vite.config.js
 ```
 
@@ -98,4 +97,3 @@ ai-resume-architect/
 ### Configuration
 * **`vite.config.js`**: Build settings for the Vite development server and bundler.
 * **`postcss.config.js`**: Wiring for `@tailwindcss/postcss`.
-* **`tailwind.config.js`**: (Legacy/Reference) Tailwind configuration settings. 
