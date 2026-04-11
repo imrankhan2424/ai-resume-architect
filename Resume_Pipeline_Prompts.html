@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Pipeline Prompts – Imran Khan</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root, [data-theme="dark"] {
+    --bg:       #0f0f11;
+    --surface:  #18181c;
+    --surface2: #202026;
+    --border:   #2a2a32;
+    --border2:  #35353f;
+    --text:     #e8e6f0;
+    --muted:    #8a88a0;
+    --accent2:  #a89df9;
+    --green:    #4ade80;
+    --code-bg:  #0c0c0f;
+    --pre-color:#c9c7e0;
+    --header-glow: rgba(124,111,247,0.15);
+    --header-tag-bg: rgba(124,111,247,0.1);
+    --header-tag-br: rgba(124,111,247,0.25);
+
+    --n1-bg:#16264a; --n1-cl:#60a5fa; --n1-br:rgba(96,165,250,0.3);
+    --n2-bg:#14301e; --n2-cl:#4ade80; --n2-br:rgba(74,222,128,0.3);
+    --n3-bg:#312509; --n3-cl:#fbbf24; --n3-br:rgba(251,191,36,0.3);
+    --n4-bg:#321010; --n4-cl:#f87171; --n4-br:rgba(248,113,113,0.3);
+
+    --fs1-bg:rgba(96,165,250,0.12);  --fs1-cl:#60a5fa;
+    --fs2-bg:rgba(74,222,128,0.12);  --fs2-cl:#4ade80;
+    --fs3-bg:rgba(251,191,36,0.12);  --fs3-cl:#fbbf24;
+    --fs4-bg:rgba(248,113,113,0.12); --fs4-cl:#f87171;
+    --fs5-bg:rgba(45,212,191,0.12);  --fs5-cl:#2dd4bf;
+    --flow-arrow:#35353f;
+
+    --toggle-bg:#18181c; --toggle-br:#2a2a32;
+    --copy-copied-cl:#4ade80; --copy-copied-br:rgba(74,222,128,0.4); --copy-copied-bg:rgba(74,222,128,0.08);
+    --note-left:#35353f;
+  }
+
+  [data-theme="light"] {
+    --bg:       #f4f3f9;
+    --surface:  #ffffff;
+    --surface2: #eeedf5;
+    --border:   #dddbe9;
+    --border2:  #c8c5dc;
+    --text:     #1a1726;
+    --muted:    #6b6886;
+    --accent2:  #6258e8;
+    --green:    #15803d;
+    --code-bg:  #eeedf5;
+    --pre-color:#2e2b44;
+    --header-glow: rgba(98,88,232,0.08);
+    --header-tag-bg: rgba(98,88,232,0.08);
+    --header-tag-br: rgba(98,88,232,0.22);
+
+    --n1-bg:#dbeafe; --n1-cl:#1d4ed8; --n1-br:rgba(37,99,235,0.3);
+    --n2-bg:#dcfce7; --n2-cl:#15803d; --n2-br:rgba(22,163,74,0.3);
+    --n3-bg:#fef9c3; --n3-cl:#854d0e; --n3-br:rgba(180,83,9,0.3);
+    --n4-bg:#fee2e2; --n4-cl:#b91c1c; --n4-br:rgba(220,38,38,0.3);
+
+    --fs1-bg:rgba(37,99,235,0.08);  --fs1-cl:#1d4ed8;
+    --fs2-bg:rgba(22,163,74,0.08);  --fs2-cl:#15803d;
+    --fs3-bg:rgba(180,83,9,0.08);   --fs3-cl:#854d0e;
+    --fs4-bg:rgba(220,38,38,0.08);  --fs4-cl:#b91c1c;
+    --fs5-bg:rgba(13,148,136,0.08); --fs5-cl:#0f766e;
+    --flow-arrow:#c8c5dc;
+
+    --toggle-bg:#ffffff; --toggle-br:#dddbe9;
+    --copy-copied-cl:#15803d; --copy-copied-br:rgba(22,163,74,0.35); --copy-copied-bg:rgba(22,163,74,0.07);
+    --note-left:#c8c5dc;
+  }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    transition: background 0.25s, color 0.25s;
+  }
+
+  /* TOGGLE */
+  .theme-toggle {
+    position: fixed; top: 1rem; right: 1.25rem; z-index: 100;
+    display: flex; align-items: center; gap: 7px;
+    background: var(--toggle-bg);
+    border: 1px solid var(--toggle-br);
+    border-radius: 999px; padding: 6px 14px 6px 10px;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500;
+    color: var(--muted);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    transition: all 0.2s;
+  }
+  .theme-toggle:hover { color: var(--text); border-color: var(--border2); }
+  .t-icon { font-size: 15px; line-height: 1; }
+
+  /* HEADER */
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    padding: 2.25rem 0 1.75rem;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .site-header::before {
+    content: ''; position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 220px;
+    background: radial-gradient(ellipse, var(--header-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-tag {
+    display: inline-block; font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--accent2);
+    background: var(--header-tag-bg); border: 1px solid var(--header-tag-br);
+    border-radius: 20px; padding: 3px 13px; margin-bottom: 14px; letter-spacing: 0.08em;
+  }
+  .site-header h1 { font-size: 2rem; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: -0.02em; }
+  .site-header h1 span { color: var(--accent2); }
+  .site-header p { font-size: 14px; color: var(--muted); max-width: 480px; margin: 0 auto; }
+
+  /* LAYOUT */
+  .container { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+  /* WORKFLOW */
+  .workflow {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.1rem 1.4rem; margin-bottom: 2.5rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    transition: background 0.25s;
+  }
+  .workflow-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
+  .flow-steps { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .flow-step { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+  .fs-1{background:var(--fs1-bg);color:var(--fs1-cl);}
+  .fs-2{background:var(--fs2-bg);color:var(--fs2-cl);}
+  .fs-3{background:var(--fs3-bg);color:var(--fs3-cl);}
+  .fs-4{background:var(--fs4-bg);color:var(--fs4-cl);}
+  .fs-5{background:var(--fs5-bg);color:var(--fs5-cl);}
+  .flow-arrow { color: var(--flow-arrow); font-size: 14px; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.12em; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* CARDS */
+  .prompt-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    margin-bottom: 1.25rem; overflow: hidden;
+    transition: border-color 0.2s, background 0.25s;
+  }
+  .prompt-card:hover { border-color: var(--border2); }
+  .card-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 12px; padding: 1.1rem 1.25rem; cursor: pointer; user-select: none;
+  }
+  .card-left { display: flex; align-items: flex-start; gap: 12px; flex: 1; }
+  .prompt-num {
+    font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+    padding: 3px 9px; border-radius: 6px; white-space: nowrap; margin-top: 2px; flex-shrink: 0;
+  }
+  .n1{background:var(--n1-bg);color:var(--n1-cl);border:1px solid var(--n1-br);}
+  .n2{background:var(--n2-bg);color:var(--n2-cl);border:1px solid var(--n2-br);}
+  .n3{background:var(--n3-bg);color:var(--n3-cl);border:1px solid var(--n3-br);}
+  .n4{background:var(--n4-bg);color:var(--n4-cl);border:1px solid var(--n4-br);}
+  .card-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .card-desc  { font-size: 13px; color: var(--muted); }
+  .card-meta  { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .meta-tag {
+    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted);
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px;
+  }
+  .toggle-icon { color: var(--muted); font-size: 12px; transition: transform 0.25s; margin-top: 4px; flex-shrink: 0; }
+  .card-header.open .toggle-icon { transform: rotate(180deg); }
+  .card-body { display: none; border-top: 1px solid var(--border); padding: 1.25rem; }
+  .card-body.open { display: block; }
+
+  /* CODE BLOCKS */
+  .code-wrap {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 1rem; transition: background 0.25s;
+  }
+  .code-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px; border-bottom: 1px solid var(--border);
+  }
+  .code-lang { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .copy-btn {
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500;
+    color: var(--muted); background: transparent;
+    border: 1px solid var(--border2); border-radius: 6px; padding: 4px 10px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .copy-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--accent2); }
+  .copy-btn.copied { color: var(--copy-copied-cl); border-color: var(--copy-copied-br); background: var(--copy-copied-bg); }
+  .copy-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+  pre {
+    padding: 1rem 1.1rem; overflow-x: auto;
+    font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.75;
+    color: var(--pre-color); white-space: pre-wrap; word-break: break-word;
+  }
+
+  /* NOTE */
+  .note {
+    font-size: 12.5px; color: var(--muted); background: var(--surface2);
+    border-left: 2px solid var(--note-left); border-radius: 0 6px 6px 0;
+    padding: 8px 12px; margin-bottom: 1rem; font-family: 'DM Mono', monospace;
+  }
+  .note strong { color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 500; }
+  .sub-label {
+    font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.1em; margin: 1rem 0 0.5rem;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 2rem 1rem; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted); transition: border-color 0.25s;
+  }
+  footer span { color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+  <span class="t-icon" id="themeIcon">☀️</span>
+  <span id="themeLabel">Light mode</span>
+</button>
+
+<header class="site-header">
+  <div class="header-tag">AI-Powered Job Application Pipeline</div>
+  <h1>Resume <span>Prompt</span> Toolkit</h1>
+  <p>4 ready-to-use prompts for Claude, ChatGPT, or Gemini — copy and paste to apply</p>
+</header>
+
+<div class="container">
+
+  <div class="workflow">
+    <span class="workflow-label">Workflow</span>
+    <div class="flow-steps">
+      <span class="flow-step fs-1">Content .md</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step fs-2">Prompt 2: ATS Resume</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step fs-3">Prompt 3: Cover Letter</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step fs-4">Prompt 4: Export PDF</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step fs-5">Apply ✓</span>
+    </div>
+  </div>
+
+  <div class="section-label">Prompts</div>
+
+  <!-- PROMPT 1 -->
+  <div class="prompt-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-left">
+        <span class="prompt-num n1">Prompt 01</span>
+        <div>
+          <div class="card-title">Tailored Resume — Format Preserved</div>
+          <div class="card-desc">Rewrites bullet points to match a job description while keeping all emojis, icons, and section structure intact.</div>
+          <div class="card-meta">
+            <span class="meta-tag">Imran_Khan_Resume_Formatted.md</span>
+            <span class="meta-tag">+ Job Description</span>
+          </div>
+        </div>
+      </div>
+      <span class="toggle-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="note"><strong>When to use:</strong> Apply to jobs where the visual/formatted PDF matters — senior positions or companies with human review.</div>
+      <div class="code-wrap">
+        <div class="code-topbar">
+          <span class="code-lang">prompt</span>
+          <button class="copy-btn" onclick="copyCode(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy prompt
+          </button>
+        </div>
+        <pre>You are an expert resume optimizer.
+
+I will give you:
+1. My resume in Markdown format (with formatting, emojis, and section structure intact)
+2. A job description
+
+Your task:
+- Rewrite bullet points to align with the job description requirements
+- Use strong action verbs and quantifiable achievements where possible
+- Add relevant keywords from the job description naturally into the content
+- Do NOT invent any experience, tools, or metrics that are not already in the resume
+- Do NOT change the structure, sections, headings, or emoji icons
+- Do NOT remove any sections
+- Keep the output in the same Markdown format
+
+Return ONLY the updated Markdown resume. No explanations.
+
+--- MY RESUME ---
+[PASTE Imran_Khan_Resume_Formatted.md content here]
+
+--- JOB DESCRIPTION ---
+[PASTE the job description here]</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMPT 2 -->
+  <div class="prompt-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-left">
+        <span class="prompt-num n2">Prompt 02</span>
+        <div>
+          <div class="card-title">ATS-Friendly Resume</div>
+          <div class="card-desc">Optimizes the plain content resume for ATS keyword matching — no icons, clean markdown, CAR-format bullet points.</div>
+          <div class="card-meta">
+            <span class="meta-tag">Imran_Khan_Resume_Content_Only.md</span>
+            <span class="meta-tag">+ Job Description</span>
+          </div>
+        </div>
+      </div>
+      <span class="toggle-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="note"><strong>When to use:</strong> Most job applications go through ATS first. Always use this for online portals, LinkedIn Easy Apply, and large companies.</div>
+      <div class="code-wrap">
+        <div class="code-topbar">
+          <span class="code-lang">prompt</span>
+          <button class="copy-btn" onclick="copyCode(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy prompt
+          </button>
+        </div>
+        <pre>You are an expert ATS resume optimizer.
+
+I will give you:
+1. My resume in plain Markdown format (no icons, no heavy formatting)
+2. A job description
+
+Your task:
+- Rewrite the resume to maximize ATS compatibility and keyword match
+- Mirror exact keywords, phrases, and terminology from the job description
+- Use simple, clean Markdown only: headers (##), bullet points (-), plain text
+- Do NOT use tables, emojis, icons, columns, or any special characters
+- Strengthen bullet points using the CAR format (Challenge → Action → Result)
+- Add a "Key Skills" or "Summary" section at the top if it improves ATS scoring
+- Do NOT invent any experience, tools, certifications, or metrics
+- Ensure job titles, company names, and dates remain exactly as provided
+
+Return ONLY the updated plain Markdown resume. No explanations.
+
+--- MY RESUME ---
+[PASTE Imran_Khan_Resume_Content_Only.md content here]
+
+--- JOB DESCRIPTION ---
+[PASTE the job description here]</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMPT 3 -->
+  <div class="prompt-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-left">
+        <span class="prompt-num n3">Prompt 03</span>
+        <div>
+          <div class="card-title">Cover Letter Generator</div>
+          <div class="card-desc">Generates a personalized, professional cover letter from your tailored resume and the job description.</div>
+          <div class="card-meta">
+            <span class="meta-tag">Tailored resume output</span>
+            <span class="meta-tag">+ Job Description</span>
+            <span class="meta-tag">+ Company / Role</span>
+          </div>
+        </div>
+      </div>
+      <span class="toggle-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="note"><strong>Run after:</strong> Prompt 01 or Prompt 02. Paste the AI's output resume as the tailored resume input below.</div>
+      <div class="code-wrap">
+        <div class="code-topbar">
+          <span class="code-lang">prompt</span>
+          <button class="copy-btn" onclick="copyCode(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy prompt
+          </button>
+        </div>
+        <pre>You are a professional career assistant.
+
+I will give you:
+1. My tailored resume in Markdown
+2. A job description
+3. The company name and role I am applying for
+
+Your task:
+Write a professional cover letter with:
+- A strong opening paragraph that hooks the reader
+- 2–3 body paragraphs connecting my experience to the job requirements
+- Specific achievements from my resume that match the job
+- A confident closing paragraph with a call to action
+- Professional tone — no generic filler phrases like "I am a hard worker"
+- Length: 3–4 paragraphs, no longer than one page
+- Do NOT use placeholders like [Your Name] — use my actual details from the resume
+
+Format the output in plain Markdown.
+
+--- MY TAILORED RESUME ---
+[PASTE your tailored resume here]
+
+--- JOB DESCRIPTION ---
+[PASTE the job description here]
+
+--- APPLYING FOR ---
+Company: [Company Name]
+Role: [Job Title]</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMPT 4 -->
+  <div class="prompt-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-left">
+        <span class="prompt-num n4">Prompt 04</span>
+        <div>
+          <div class="card-title">Markdown → PDF Converter (Python)</div>
+          <div class="card-desc">Run locally to convert any .md file to a clean, styled PDF. Works for resume and cover letter.</div>
+          <div class="card-meta">
+            <span class="meta-tag">Python 3</span>
+            <span class="meta-tag">pip install markdown weasyprint</span>
+          </div>
+        </div>
+      </div>
+      <span class="toggle-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="sub-label">Step 1 — Install dependencies</div>
+      <div class="code-wrap">
+        <div class="code-topbar">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <pre>pip install markdown weasyprint</pre>
+      </div>
+
+      <div class="sub-label">Step 2 — Save as md_to_pdf.py</div>
+      <div class="code-wrap">
+        <div class="code-topbar">
+          <span class="code-lang">python</span>
+          <button class="copy-btn" onclick="copyCode(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy script
+          </button>
+        </div>
+        <pre>import markdown
+from weasyprint import HTML
+import sys
+
+def md_to_pdf(input_md, output_pdf):
+    with open(input_md, "r", encoding="utf-8") as f:
+        md_content = f.read()
+
+    html_body = markdown.markdown(md_content, extensions=["extra", "nl2br"])
+
+    html_full = f"""
+    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+    &lt;head&gt;
+        &lt;meta charset="utf-8"&gt;
+        &lt;style&gt;
+            body {{
+                font-family: 'Arial', sans-serif;
+                font-size: 11pt;
+                line-height: 1.5;
+                margin: 40px 50px;
+                color: #1a1a1a;
+            }}
+            h1 {{ font-size: 22pt; margin-bottom: 2px; color: #000; }}
+            h2 {{
+                font-size: 13pt;
+                border-bottom: 1px solid #ccc;
+                padding-bottom: 4px;
+                margin-top: 20px;
+                color: #2c2c2c;
+            }}
+            h3 {{ font-size: 11pt; margin-bottom: 2px; color: #000; }}
+            ul {{ margin: 4px 0; padding-left: 20px; }}
+            li {{ margin-bottom: 4px; }}
+            p {{ margin: 4px 0; }}
+            hr {{ border: none; border-top: 1px solid #ddd; margin: 14px 0; }}
+            a {{ color: #0057b8; text-decoration: none; }}
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;{html_body}&lt;/body&gt;
+    &lt;/html&gt;
+    """
+
+    HTML(string=html_full).write_pdf(output_pdf)
+    print(f"PDF saved to: {output_pdf}")
+
+if __name__ == "__main__":
+    if len(sys.argv) == 3:
+        md_to_pdf(sys.argv[1], sys.argv[2])
+    else:
+        md_to_pdf("Imran_Khan_Resume_Formatted.md", "Imran_Khan_Resume_Formatted.pdf")
+        md_to_pdf("Imran_Khan_Resume_Content_Only.md", "Imran_Khan_Resume_ATS.pdf")</pre>
+      </div>
+
+      <div class="sub-label">Step 3 — Run it</div>
+      <div class="code-wrap">
+        <div class="code-topbar">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <pre># Convert ATS resume
+python md_to_pdf.py Tailored_ATS_Resume.md Tailored_ATS_Resume.pdf
+
+# Convert cover letter
+python md_to_pdf.py Cover_Letter.md Cover_Letter.pdf
+
+# Convert formatted resume
+python md_to_pdf.py Imran_Khan_Resume_Formatted.md Imran_Khan_Resume.pdf</pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Built for <span>Imran Khan</span> · Senior Software Test Engineer · Dubai, UAE
+</footer>
+
+<script>
+  const html = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+  const label = document.getElementById('themeLabel');
+
+  const saved = localStorage.getItem('ik-theme');
+  if (saved) applyTheme(saved);
+
+  function applyTheme(t) {
+    html.setAttribute('data-theme', t);
+    localStorage.setItem('ik-theme', t);
+    if (t === 'light') { icon.textContent = '🌙'; label.textContent = 'Dark mode'; }
+    else               { icon.textContent = '☀️'; label.textContent = 'Light mode'; }
+  }
+
+  function toggleTheme() {
+    applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  }
+
+  function toggleCard(header) {
+    const body = header.nextElementSibling;
+    const open = body.classList.contains('open');
+    body.classList.toggle('open', !open);
+    header.classList.toggle('open', !open);
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-wrap').querySelector('pre');
+    const txt = pre.innerText
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+    navigator.clipboard.writeText(txt).then(() => {
+      const orig = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
