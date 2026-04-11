@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Printer, Edit3, Settings, ShieldCheck, FileText, Copy, Check } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Printer, Edit3, Settings, ShieldCheck, FileText, Copy, Check, Maximize2, X } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
 
 const PDFExport = () => {
   const { mode, aiResult, setAiResult, includeCoverLetter, aiCoverLetterResult, setAiCoverLetterResult } = useResume();
   const [printTarget, setPrintTarget] = React.useState('both');
-  const [copiedResume, setCopiedResume] = React.useState(false);
-  const [copiedCoverLetter, setCopiedCoverLetter] = React.useState(false);
+  const [copiedResume, setCopiedResume] = useState(false);
+  const [copiedCoverLetter, setCopiedCoverLetter] = useState(false);
+  const [modalTarget, setModalTarget] = useState(null); // 'resume' | 'cover' | null
 
   const handlePrint = (target) => {
     setPrintTarget(target);
@@ -162,6 +164,16 @@ const PDFExport = () => {
               <FileText size={10} color="#7c3aed" />
               <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: '#7c3aed' }}>Cover Letter Live Preview</span>
             </div>
+            
+            <button
+               onClick={() => setModalTarget('cover')}
+               className="absolute top-6 right-6 z-20 w-8 h-8 rounded-lg bg-white/90 backdrop-blur-md border shadow-md flex items-center justify-center opacity-90 transition-all duration-300 hover:scale-110 hover:opacity-100 no-print text-[var(--accent)] hover:bg-[var(--accent-soft)]"
+               style={{ borderColor: 'var(--border)' }}
+               title="Expand Preview"
+             >
+               <Maximize2 size={15} />
+            </button>
+
             <div className="glass-card overflow-hidden print-preview-wrapper" style={{ padding: 'clamp(0.75rem, 2vw, 2rem)', background: 'rgba(0,0,0,0.06)' }}>
               <div id="cover-letter-print-area"
                 className={`print-resume shadow-2xl w-full mx-auto overflow-hidden transition-all duration-500 bg-white text-black ${mode === 'ats' ? 'font-serif' : 'font-sans'}`}
@@ -183,6 +195,16 @@ const PDFExport = () => {
             <FileText size={10} color="#059669" />
             <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: '#059669' }}>Resume Live Preview</span>
           </div>
+          
+          <button
+             onClick={() => setModalTarget('resume')}
+             className="absolute top-6 right-6 z-20 w-8 h-8 rounded-lg bg-white/90 backdrop-blur-md border shadow-md flex items-center justify-center opacity-90 transition-all duration-300 hover:scale-110 hover:opacity-100 no-print text-[var(--emerald)] hover:bg-[var(--emerald-soft)]"
+             style={{ borderColor: 'var(--border)' }}
+             title="Expand Preview"
+           >
+             <Maximize2 size={15} />
+          </button>
+
           <div className="glass-card overflow-hidden print-preview-wrapper" style={{ padding: 'clamp(0.75rem, 2vw, 2rem)', background: 'rgba(0,0,0,0.06)' }}>
             <div
               id="resume-print-area"
@@ -199,6 +221,61 @@ const PDFExport = () => {
         </div>
 
       </div>
+
+      {/* ── Modal Portal ────────────────────────────── */}
+      {modalTarget && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md transition-opacity no-print" onClick={() => setModalTarget(null)}>
+          <div className="w-full max-w-5xl h-full max-h-[95vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border" style={{ borderColor: 'var(--border)' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 px-6 border-b" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: modalTarget === 'cover' ? 'rgba(124, 58, 237, 0.15)' : 'rgba(5, 150, 105, 0.15)', color: modalTarget === 'cover' ? '#7c3aed' : '#059669' }}>
+                  <FileText size={16} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[15px]" style={{ color: '#000' }}>
+                    {modalTarget === 'cover' ? 'Cover Letter Preview' : 'Resume Preview'}
+                  </h3>
+                  <p className="text-[11px] font-medium" style={{ color: '#666' }}>
+                    Full layout preview · Scroll to read
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setModalTarget(null)}
+                className="w-8 h-8 rounded-xl flex items-center justify-center border hover:bg-gray-100 transition-colors text-black"
+                style={{ borderColor: 'rgba(0,0,0,0.1)' }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto overflow-x-auto p-4 sm:p-8 flex flex-col items-center" style={{ background: 'rgba(0,0,0,0.04)' }}>
+              <div className={`shrink-0 shadow-2xl w-full mx-auto bg-white text-black ${mode === 'ats' ? 'font-serif' : 'font-sans'}`} style={{ maxWidth: '8.5in', minHeight: '11in' }}>
+                 {modalTarget === 'cover' ? (
+                   <div style={{ padding: 'clamp(0.5in, 4vw, 0.85in)', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
+                     <ReactMarkdown className="cover-letter-render">
+                       {aiCoverLetterResult || '### Cover Letter Preview\nYour generated cover letter content will render here.'}
+                     </ReactMarkdown>
+                   </div>
+                 ) : (
+                   <div style={{ padding: 'clamp(0.4in, 3vw, 0.7in)', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
+                     <ReactMarkdown className="markdown-render">
+                       {aiResult || '### Layout Preview\nYour generated resume content will render here with precise typesetting for PDF export.'}
+                     </ReactMarkdown>
+                   </div>
+                 )}
+              </div>
+            </div>
+            
+            <div className="p-4 px-6 flex justify-end items-center border-t bg-gray-50 text-black" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+              <button onClick={() => setModalTarget(null)} className="btn bg-gray-200 hover:bg-gray-300 border border-gray-300 font-semibold h-9 px-6 text-xs text-black">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       <style dangerouslySetInnerHTML={{ __html: `
         /* ── Document skin ──────────────────────── */
