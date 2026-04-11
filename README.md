@@ -25,6 +25,17 @@ To optimize token usage and help developers map our project properly, we have ma
 
 ---
 
+## 🛠️ Why This Tech Stack Was Chosen
+
+This application was intentionally designed to run natively in your browser with zero backend data storage, prioritizing privacy while maintaining premium fidelity. 
+
+- **React 18 + Vite**: Chosen strictly for speed and simplicity. Vite's Hot Module Replacement (HMR) allows for ultra-fast UI iteration. React's Context API was more than enough for our state management (persisting prompts via `localStorage`), negating the heavy baggage of Next.js or Redux.
+- **Tailwind CSS v4**: Picked for extreme styling velocity. With Tailwind v4's new engine, we eliminated complex config files entirely. It allowed us to instantly prototype our "glassmorphism" components natively over CSS variables without requiring bloated UI component libraries (like MUI or AntDesign). 
+- **React-Markdown**: The backbone of the application. Since AI models output strictly in raw Markdown, injecting `react-markdown` bridges the gap perfectly—allowing the React engine to parse the AI output directly into DOM HTML nodes.
+- **Native Browser Print Engine**: Replaced legacy dependency-heavy Python PDF utilities (like `weasyprint`). By leveraging dedicated `@media print` CSS classes and `data-print-target` architecture, we tricked the client's browser into acting as a high-fidelity rendering pipeline, meaning absolutely zero backend processing is required for PDF generation! 
+
+---
+
 ## 🚀 Getting Started
 
 **1. Install Dependencies**
