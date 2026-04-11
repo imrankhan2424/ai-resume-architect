@@ -14,6 +14,18 @@ A premium, streamlined web application for modern job seekers. Automate your res
 
 ---
 
+## 🛠️ Why This Tool Stack?
+
+This application is engineered for speed, professional aesthetics, and seamless AI integration.
+
+- **React 18 & Vite**: The foundation for a high-performance, reactive user interface. Vite provides near-instant HMR, which is critical for fine-tuning CSS print layouts.
+- **Modern Vanilla CSS**: Instead of generic UI libraries, we use a custom-crafted CSS design system with CSS variables and glassmorphism. This ensures a "premium" feel while maintaining total control over PDF print accuracy.
+- **React Markdown**: Tailored resumes from LLMs (Claude/GPT) are typically delivered in Markdown. This stack allows for instant, real-time rendering of complex AI output directly into professional templates.
+- **Lucide React**: A lightweight, crisp icon set that enhances the visual hierarchy without sacrificing performance.
+- **Zero-Backend Architecture**: By leveraging `localStorage` and client-side processing, your data staying strictly in your browser, ensuring maximum privacy for your professional information.
+
+---
+
 ## ⚡ Quick Start
 
 ### 1. Install Dependencies
