@@ -53,8 +53,4 @@ npm run build
 5. Review the **Live Previews** on the right panel.
 6. Click **Print Resume**, **Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
 
----
 
-## 📁 Legacy Files
-
-The original prompt toolkit (`.html` and `.md` files) and the Python `weasyprint` script (`md_to_pdf.py`) have been moved to the `legacy_assets/` folder and are preserved for archive purposes.

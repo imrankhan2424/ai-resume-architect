@@ -65,11 +65,6 @@ ai-resume-architect/
 │   │   └── index.css
 │   ├── App.jsx
 │   └── main.jsx
-├── legacy_assets/
-│   ├── Imran_Khan_Resume_Content_Only.md
-│   ├── Imran_Khan_Resume_Formatted.md
-│   ├── LEGACY_README.md
-│   └── Resume_Pipeline_Prompts.html
 ├── ARCHITECTURE.md
 ├── index.html
 ├── package.json
