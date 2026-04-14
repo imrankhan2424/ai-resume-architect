@@ -7,14 +7,19 @@ import { useResume } from '../context/ResumeContext';
 const PDFExport = () => {
   const { mode, aiResult, setAiResult, includeCoverLetter, aiCoverLetterResult, setAiCoverLetterResult } = useResume();
   const [printTarget, setPrintTarget] = React.useState('both');
+  const [activePrintStyle, setActivePrintStyle] = useState(null); // 'visual' | 'ats' | null
+  const [showVisualPreview, setShowVisualPreview] = useState(false);
   const [copiedResume, setCopiedResume] = useState(false);
   const [copiedCoverLetter, setCopiedCoverLetter] = useState(false);
   const [modalTarget, setModalTarget] = useState(null); // 'resume' | 'cover' | null
 
-  const handlePrint = (target) => {
+  const handlePrint = (target, styleOverride = null) => {
     setPrintTarget(target);
+    setActivePrintStyle(styleOverride);
     setTimeout(() => {
       window.print();
+      // Optional: Reset after print dialog triggers
+      setTimeout(() => setActivePrintStyle(null), 500);
     }, 100);
   };
 
@@ -31,6 +36,8 @@ const PDFExport = () => {
     setCopiedCoverLetter(true);
     setTimeout(() => setCopiedCoverLetter(false), 2000);
   };
+
+  const effectivePrintMode = activePrintStyle || (mode === 'ats' && showVisualPreview ? 'visual' : mode);
 
   return (
     <div data-print-target={printTarget} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -115,37 +122,67 @@ const PDFExport = () => {
 
         {(aiResult || aiCoverLetterResult) && (
           <div className="flex flex-col gap-3" style={{ marginTop: '2rem' }}>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => handlePrint('resume')}
-                className="btn btn-emerald h-9 px-4 text-xs"
-                disabled={!aiResult}
-              >
-                <Printer size={14} />
-                Print Resume
-              </button>
-              {includeCoverLetter && (
-                <>
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => handlePrint('resume')}
+                  className="btn btn-emerald h-9 px-4 text-xs"
+                  disabled={!aiResult}
+                >
+                  <Printer size={14} />
+                  Print Resume
+                </button>
+                
+                {mode === 'ats' && (
                   <button
-                    onClick={() => handlePrint('cover-letter')}
-                    className="btn btn-primary h-9 px-4 text-xs"
-                    disabled={!aiCoverLetterResult}
+                    onClick={() => handlePrint('resume', 'visual')}
+                    className="btn btn-emerald h-9 px-4 text-xs"
+                    disabled={!aiResult}
                   >
                     <Printer size={14} />
-                    Print Cover Letter
+                    Print (Visual Design)
                   </button>
-                  <button
-                    onClick={() => handlePrint('both')}
-                    className="btn text-white h-9 px-4 text-xs"
-                    style={{ background: 'linear-gradient(135deg, var(--emerald) 0%, var(--accent) 100%)' }}
-                    disabled={!aiResult || !aiCoverLetterResult}
-                  >
-                    <Printer size={14} />
-                    Export Combined PDF
-                  </button>
-                </>
+                )}
+
+                {includeCoverLetter && (
+                  <>
+                    <button
+                      onClick={() => handlePrint('cover-letter')}
+                      className="btn btn-primary h-9 px-4 text-xs"
+                      disabled={!aiCoverLetterResult}
+                    >
+                      <Printer size={14} />
+                      Print Cover Letter
+                    </button>
+                    <button
+                      onClick={() => handlePrint('both')}
+                      className="btn text-white h-9 px-4 text-xs"
+                      style={{ background: 'linear-gradient(135deg, var(--emerald) 0%, var(--accent) 100%)' }}
+                      disabled={!aiResult || !aiCoverLetterResult}
+                    >
+                      <Printer size={14} />
+                      Export Combined PDF
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {mode === 'ats' && (
+                <div className="flex items-center gap-2.5 ml-auto no-print">
+                  <span className={`text-[9px] font-extrabold uppercase tracking-widest transition-colors ${!showVisualPreview ? 'text-emerald-600' : 'text-muted'}`}>ATS View</span>
+                  <label className="switch">
+                    <input 
+                      type="checkbox" 
+                      checked={showVisualPreview}
+                      onChange={(e) => setShowVisualPreview(e.target.checked)}
+                    />
+                    <span className="slider"></span>
+                  </label>
+                  <span className={`text-[9px] font-extrabold uppercase tracking-widest transition-colors ${showVisualPreview ? 'text-accent' : 'text-muted'}`}>Visual View</span>
+                </div>
               )}
             </div>
+            
             <div className="flex items-center gap-2 text-[10.5px] font-medium px-3 py-2 rounded-lg border w-fit" style={{ color: 'var(--emerald)', background: 'var(--emerald-soft)', borderColor: 'rgba(5,150,105,0.15)' }}>
               <Settings size={12} />
               In the print dialog, choose <strong>&ldquo;Save as PDF&rdquo;</strong> and <strong>Margins: Default</strong>
@@ -176,7 +213,7 @@ const PDFExport = () => {
 
             <div className="glass-card overflow-hidden print-preview-wrapper" style={{ padding: 'clamp(0.75rem, 2vw, 2rem)', background: 'rgba(0,0,0,0.06)' }}>
               <div id="cover-letter-print-area"
-                className={`print-resume shadow-2xl w-full mx-auto overflow-hidden transition-all duration-500 bg-white text-black ${mode === 'ats' ? 'font-serif' : 'font-sans'}`}
+                className={`print-resume shadow-2xl w-full mx-auto overflow-hidden transition-all duration-500 bg-white text-black ${effectivePrintMode === 'ats' ? 'font-serif' : 'font-sans'}`}
                 style={{ maxWidth: '8.5in', minHeight: '11in' }}
               >
                 <div style={{ padding: 'clamp(0.5in, 4vw, 0.85in)', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
@@ -208,7 +245,7 @@ const PDFExport = () => {
           <div className="glass-card overflow-hidden print-preview-wrapper" style={{ padding: 'clamp(0.75rem, 2vw, 2rem)', background: 'rgba(0,0,0,0.06)' }}>
             <div
               id="resume-print-area"
-              className={`print-resume shadow-2xl w-full mx-auto overflow-hidden transition-all duration-500 bg-white text-black ${mode === 'ats' ? 'font-serif' : 'font-sans'}`}
+              className={`print-resume shadow-2xl w-full mx-auto overflow-hidden transition-all duration-500 bg-white text-black ${effectivePrintMode === 'ats' ? 'font-serif' : 'font-sans'}`}
               style={{ maxWidth: '8.5in', minHeight: '11in' }}
             >
               <div style={{ padding: 'clamp(0.4in, 3vw, 0.7in)', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
@@ -250,7 +287,7 @@ const PDFExport = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto overflow-x-auto p-4 sm:p-8 flex flex-col items-center" style={{ background: 'rgba(0,0,0,0.04)' }}>
-              <div className={`shrink-0 shadow-2xl w-full mx-auto bg-white text-black ${mode === 'ats' ? 'font-serif' : 'font-sans'}`} style={{ maxWidth: '8.5in', minHeight: '11in' }}>
+              <div className={`shrink-0 shadow-2xl w-full mx-auto bg-white text-black ${effectivePrintMode === 'ats' ? 'font-serif' : 'font-sans'}`} style={{ maxWidth: '8.5in', minHeight: '11in' }}>
                  {modalTarget === 'cover' ? (
                    <div style={{ padding: 'clamp(0.5in, 4vw, 0.85in)', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
                      <ReactMarkdown className="cover-letter-render">
@@ -278,6 +315,44 @@ const PDFExport = () => {
       )}
 
       <style dangerouslySetInnerHTML={{ __html: `
+        /* ── Toggle Switch ──────────────────────── */
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 32px;
+          height: 18px;
+        }
+        .switch input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          inset: 0;
+          background-color: var(--border);
+          transition: .4s;
+          border-radius: 20px;
+        }
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 12px;
+          width: 12px;
+          left: 3px;
+          bottom: 3px;
+          background-color: white;
+          transition: .4s;
+          border-radius: 50%;
+        }
+        input:checked + .slider {
+          background-color: var(--emerald);
+        }
+        input:checked + .slider:before {
+          transform: translateX(14px);
+        }
+
         /* ── Document skin ──────────────────────── */
         .print-resume {
           font-variant-ligatures: common-ligatures;
