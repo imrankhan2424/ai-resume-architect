@@ -29,10 +29,23 @@ export const ResumeProvider = ({ children }) => {
     }
     return { visual: defaultResumes.visual, ats: defaultResumes.ats };
   });
+  
   const [jobDescription, setJobDescription] = useState('');
   const [aiResult, setAiResult] = useState('');
   const [includeCoverLetter, setIncludeCoverLetter] = useState(false);
+  
+  // NEW: Lead Hub State
+  const [includeLeadExtraction, setIncludeLeadExtraction] = useState(() => {
+    return localStorage.getItem('resume-include-lead') === 'true';
+  });
+  
   const [aiCoverLetterResult, setAiCoverLetterResult] = useState('');
+  const [leadAiResult, setLeadAiResult] = useState('');
+  
+  const [contacts, setContacts] = useState(() => {
+    const saved = localStorage.getItem('resume-contacts');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   useEffect(() => {
     localStorage.setItem('resume-theme', theme);
@@ -47,8 +60,28 @@ export const ResumeProvider = ({ children }) => {
     localStorage.setItem('resume-data', JSON.stringify(resumes));
   }, [resumes]);
 
+  useEffect(() => {
+    localStorage.setItem('resume-include-lead', String(includeLeadExtraction));
+  }, [includeLeadExtraction]);
+
+  useEffect(() => {
+    localStorage.setItem('resume-contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
   const updateResume = (type, content) => {
     setResumes(prev => ({ ...prev, [type]: content }));
+  };
+
+  const addContact = (contact) => {
+    setContacts(prev => {
+      // Basic deduplication by email
+      if (prev.some(c => c.email.toLowerCase() === contact.email.toLowerCase())) return prev;
+      return [contact, ...prev];
+    });
+  };
+
+  const removeContact = (id) => {
+    setContacts(prev => prev.filter(c => c.id !== id));
   };
 
   return (
@@ -59,7 +92,10 @@ export const ResumeProvider = ({ children }) => {
       jobDescription, setJobDescription,
       aiResult, setAiResult,
       includeCoverLetter, setIncludeCoverLetter,
-      aiCoverLetterResult, setAiCoverLetterResult
+      includeLeadExtraction, setIncludeLeadExtraction,
+      aiCoverLetterResult, setAiCoverLetterResult,
+      leadAiResult, setLeadAiResult,
+      contacts, setContacts, addContact, removeContact
     }}>
       {children}
     </ResumeContext.Provider>

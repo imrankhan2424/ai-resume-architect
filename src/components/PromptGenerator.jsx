@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Copy, Check, MessageSquare, Briefcase, Sparkles, FileText, Maximize2, X } from 'lucide-react';
+import { Copy, Check, MessageSquare, Briefcase, Sparkles, FileText, Maximize2, X, Mail, UserCheck, PlusCircle } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
 import clsx from 'clsx';
 
 const PromptGenerator = () => {
-  const { mode, resumes, jobDescription, setJobDescription, includeCoverLetter, setIncludeCoverLetter } = useResume();
+  const { 
+    mode, resumes, jobDescription, setJobDescription, 
+    includeCoverLetter, setIncludeCoverLetter,
+    includeLeadExtraction, setIncludeLeadExtraction 
+  } = useResume();
+  
   const [copiedResume, setCopiedResume] = useState(false);
   const [copiedCover, setCopiedCover] = useState(false);
+  const [copiedLead, setCopiedLead] = useState(false);
   const [copiedJobDescription, setCopiedJobDescription] = useState(false);
-  const [modalTarget, setModalTarget] = useState(null); // 'resume' | 'cover' | null
+  const [modalTarget, setModalTarget] = useState(null); // 'resume' | 'cover' | 'lead' | null
 
   const handleCopyJobDescription = () => {
     if (!jobDescription) return;
@@ -18,7 +24,31 @@ const PromptGenerator = () => {
     setTimeout(() => setCopiedJobDescription(false), 2000);
   };
 
-  // ── Resume Prompt (reverted to original clean versions) ──────────
+  // ── Lead Extraction Prompt ──────────────────────────────────────
+  const assembleLeadExtractionPrompt = () => {
+    return `You are an expert recruitment researcher. 
+    
+I will give you a job description. 
+
+Your task:
+- Extract specific HR / Lead information from the job description
+- Format the output exactly like this structure:
+
+Company: [Company Name]
+Location: [Job Location/Remote]
+Email: [HR or Recruiter Email]
+Person: [Hiring Manager or Recruiter Name]
+
+RULES:
+- If any detail is missing, leave it as [NONE] or [UNKNOWN]
+- Be precise. Extract only the information found in the text.
+- Return ONLY the details above. No other text.
+
+--- JOB DESCRIPTION ---
+${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
+  };
+
+  // ── Resume Prompt ──────────────────────────────────────────────
   const assembleResumePrompt = () => {
     const resumeText = resumes[mode];
     const isATS = mode === 'ats';
@@ -142,23 +172,38 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
     setTimeout(() => setCopiedCover(false), 2200);
   };
 
+  const handleCopyLead = () => {
+    navigator.clipboard.writeText(assembleLeadExtractionPrompt());
+    setCopiedLead(true);
+    setTimeout(() => setCopiedLead(false), 2200);
+  };
+
   const modeBadge = mode === 'ats'
     ? { label: 'ATS Mode', color: 'badge badge-emerald' }
     : { label: 'Visual Mode', color: 'badge badge-accent' };
 
   // Helper: get the active modal prompt text
-  const getModalPrompt = () => modalTarget === 'cover' ? assembleCoverLetterPrompt() : assembleResumePrompt();
+  const getModalPrompt = () => {
+    if (modalTarget === 'cover') return assembleCoverLetterPrompt();
+    if (modalTarget === 'lead') return assembleLeadExtractionPrompt();
+    return assembleResumePrompt();
+  };
+
   const handleModalCopy = () => {
-    navigator.clipboard.writeText(getModalPrompt());
+    const text = getModalPrompt();
+    navigator.clipboard.writeText(text);
     if (modalTarget === 'cover') {
       setCopiedCover(true);
       setTimeout(() => setCopiedCover(false), 2200);
+    } else if (modalTarget === 'lead') {
+      setCopiedLead(true);
+      setTimeout(() => setCopiedLead(false), 2200);
     } else {
       setCopiedResume(true);
       setTimeout(() => setCopiedResume(false), 2200);
     }
   };
-  const isModalCopied = modalTarget === 'cover' ? copiedCover : copiedResume;
+  const isModalCopied = modalTarget === 'cover' ? copiedCover : (modalTarget === 'lead' ? copiedLead : copiedResume);
 
   // ── Reusable Prompt Section Component ───────────────────────────
   const PromptSection = ({ title, icon: Icon, iconColor, iconBg, badge, prompt, onCopy, copied, onExpand }) => (
@@ -219,7 +264,6 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
           </div>
           <p className="text-[10.5px] font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             Copy the prompt above and paste it into your preferred LLM (ChatGPT, Claude, Gemini).
-            The prompt is pre-configured for <strong>{mode.toUpperCase()}</strong> resume architecture.
           </p>
         </div>
       </div>
@@ -262,22 +306,42 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
           style={{ minHeight: '200px' }}
         />
 
-        <div className="mt-6 flex items-center justify-between" style={{ padding: '0 0.25rem' }}>
-          <div className="flex flex-col gap-1">
-            <span className="text-sm font-semibold transition-colors duration-300" style={{ color: includeCoverLetter ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Need Cover Letter?</span>
-            <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>Adds a separate cover letter prompt section below.</span>
+        <div className="mt-8 flex flex-col gap-5">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-semibold transition-colors duration-300" style={{ color: includeCoverLetter ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Need Cover Letter?</span>
+              <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>Adds a cover letter prompt section below.</span>
+            </div>
+            <button
+              onClick={() => setIncludeCoverLetter(!includeCoverLetter)}
+              className="relative flex items-center h-6 rounded-full w-11 transition-all duration-300 focus:outline-none shrink-0"
+              style={{ 
+                background: includeCoverLetter ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--border)',
+              }}
+            >
+              <span
+                className={clsx("inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md", includeCoverLetter ? "translate-x-6" : "translate-x-1")}
+              />
+            </button>
           </div>
-          <button
-            onClick={() => setIncludeCoverLetter(!includeCoverLetter)}
-            className="relative flex items-center h-6 rounded-full w-11 transition-all duration-300 focus:outline-none shrink-0"
-            style={{ 
-              background: includeCoverLetter ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--border)',
-            }}
-          >
-            <span
-              className={clsx("inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md", includeCoverLetter ? "translate-x-6" : "translate-x-1")}
-            />
-          </button>
+
+          <div className="flex items-center justify-between px-1">
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-semibold transition-colors duration-300" style={{ color: includeLeadExtraction ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Target HR Lead?</span>
+              <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>Identify recruiter email & name details separately.</span>
+            </div>
+            <button
+              onClick={() => setIncludeLeadExtraction(!includeLeadExtraction)}
+              className="relative flex items-center h-6 rounded-full w-11 transition-all duration-300 focus:outline-none shrink-0"
+              style={{ 
+                background: includeLeadExtraction ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--border)',
+              }}
+            >
+              <span
+                className={clsx("inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md", includeLeadExtraction ? "translate-x-6" : "translate-x-1")}
+              />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -309,7 +373,22 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
         />
       )}
 
-      {/* ── Full Screen Prompt Modal ───────────────── */}
+      {/* ── Lead Extraction Prompt Section (conditional) ── */}
+      {includeLeadExtraction && (
+        <PromptSection
+          title="Lead Intel Prompt"
+          icon={Mail}
+          iconColor="#4f46e5"
+          iconBg="rgba(79,70,229,0.1)"
+          badge={{ label: 'Lead Extraction', color: 'badge bg-indigo-100 text-indigo-700' }}
+          prompt={assembleLeadExtractionPrompt()}
+          onCopy={handleCopyLead}
+          copied={copiedLead}
+          onExpand={() => setModalTarget('lead')}
+        />
+      )}
+
+      {/* ── Modal Portal ───────────────── */}
       {modalTarget && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md transition-opacity" onClick={() => setModalTarget(null)}>
           <div 
@@ -317,35 +396,30 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
             onClick={e => e.stopPropagation()}
             style={{ background: '#0d1117', borderColor: 'rgba(255,255,255,0.12)' }}
           >
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-4 px-6 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)', background: '#161b22' }}>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: modalTarget === 'cover' ? 'rgba(124, 58, 237, 0.15)' : 'rgba(217,119,6,0.15)' }}>
-                  {modalTarget === 'cover' ? <FileText size={18} color="#c084fc" /> : <Sparkles size={18} color="#fbbf24" />}
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: modalTarget === 'cover' ? 'rgba(124, 58, 237, 0.15)' : (modalTarget === 'lead' ? 'rgba(79,70,229,0.15)' : 'rgba(217,119,6,0.15)') }}>
+                  {modalTarget === 'cover' ? <FileText size={18} color="#c084fc" /> : (modalTarget === 'lead' ? <Mail size={18} color="#818cf8" /> : <Sparkles size={18} color="#fbbf24" />)}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[15px] text-white">{modalTarget === 'cover' ? 'Cover Letter Prompt' : 'Resume Prompt'}</h3>
+                  <h3 className="font-semibold text-[15px] text-white">
+                    {modalTarget === 'cover' ? 'Cover Letter Prompt' : (modalTarget === 'lead' ? 'Lead Extraction Prompt' : 'Resume Prompt')}
+                  </h3>
                   <p className="text-[11px] text-slate-400">Ready to paste into ChatGPT or Claude</p>
                 </div>
               </div>
-              <button 
-                onClick={() => setModalTarget(null)}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white"
-              >
+              <button onClick={() => setModalTarget(null)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
                 <X size={20} />
               </button>
             </div>
             
-            {/* Modal Body */}
             <div className="overflow-hidden flex-1 flex flex-col relative" style={{ background: '#0d1117' }}>
               <div className="overflow-y-auto flex-1 relative z-20">
                 <pre className="text-[13px] leading-7 font-mono whitespace-pre-wrap select-all text-slate-300" style={{ padding: '2rem 2.5rem', margin: 0, tabSize: 2 }}>{getModalPrompt()}</pre>
               </div>
-              {/* Fade out bottom overlay */}
               <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-[#0d1117] to-transparent pointer-events-none z-30" />
             </div>
 
-            {/* Modal Footer */}
             <div className="p-4 px-6 flex justify-between items-center" style={{ background: '#161b22', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <span className="text-xs text-slate-400 flex items-center gap-2 hidden sm:flex">
                 <MessageSquare size={14} /> Paste this entire block directly into your LLM chat.
@@ -356,7 +430,7 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
                   "btn h-10 px-6 text-sm font-semibold shadow-xl transition-all duration-300 border-0 text-white w-full sm:w-auto",
                   isModalCopied 
                     ? "bg-emerald-600 hover:bg-emerald-500" 
-                    : (modalTarget === 'cover' ? "bg-violet-600 hover:bg-violet-500" : "bg-amber-600 hover:bg-amber-500")
+                    : (modalTarget === 'cover' ? "bg-violet-600 hover:bg-violet-500" : (modalTarget === 'lead' ? "bg-indigo-600 hover:bg-indigo-500" : "bg-amber-600 hover:bg-amber-500"))
                 )}
               >
                 {isModalCopied ? <Check size={16} /> : <Copy size={16} />}

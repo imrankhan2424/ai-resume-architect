@@ -1,6 +1,8 @@
 import React from 'react';
 import PromptGenerator from './PromptGenerator';
 import PDFExport from './PDFExport';
+import ContactHub from './ContactHub';
+import { useResume } from '../context/ResumeContext';
 import { Zap } from 'lucide-react';
 
 const TipItem = ({ number, children }) => (
@@ -23,6 +25,9 @@ const SectionHeader = ({ step, stepClass, title, subtitle }) => (
 );
 
 const MainLayout = () => {
+  const { includeLeadExtraction, contacts } = useResume();
+  const showHub = includeLeadExtraction || contacts.length > 0;
+
   return (
     <main
       style={{
@@ -108,6 +113,9 @@ const MainLayout = () => {
         </div>
 
       </div>
+
+      {/* ── HR Outreach Hub (Bottom Section) ── */}
+      {showHub && <ContactHub />}
     </main>
   );
 };
