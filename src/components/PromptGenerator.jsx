@@ -17,6 +17,12 @@ const PromptGenerator = () => {
   const [copiedJobDescription, setCopiedJobDescription] = useState(false);
   const [modalTarget, setModalTarget] = useState(null); // 'resume' | 'cover' | 'lead' | null
 
+  // ── Creative Reframing State ─────────────────────────────────────
+  const [enableOtherRoles, setEnableOtherRoles] = useState(false);
+  const [otherJobRoles, setOtherJobRoles] = useState('');
+  const [enableUntouchedTools, setEnableUntouchedTools] = useState(false);
+  const [untouchedTools, setUntouchedTools] = useState('');
+
   const handleCopyJobDescription = () => {
     if (!jobDescription) return;
     navigator.clipboard.writeText(jobDescription);
@@ -48,10 +54,51 @@ RULES:
 ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
   };
 
+  // ── Creative Reframing Block (injected into resume prompt when enabled) ──
+  const buildCreativeReframingBlock = () => {
+    const hasRoles = enableOtherRoles && otherJobRoles.trim();
+    const hasTools = enableUntouchedTools && untouchedTools.trim();
+    if (!hasRoles && !hasTools) return '';
+
+    const lines = [
+      '',
+      '--- CREATIVE REFRAMING INSTRUCTIONS ---',
+      'IMPORTANT: The following instructions apply ONLY to older / earlier experience entries (NOT the most recent job):',
+      '- Keep ALL personal details (name, contact, education, certifications) exactly as they are',
+      '- Keep the most recent work experience entry completely unchanged — do NOT alter its title, company, dates, or bullet points',
+    ];
+
+    if (hasRoles) {
+      lines.push(
+        `- For earlier/older experience entries, you MAY reframe the job role/title to one of these target roles: ${otherJobRoles.trim()}`,
+        '  - The company name, dates, and personal achievements MUST remain believable and consistent with the real experience',
+        '  - Adapt the bullet points to sound natural for that reframed role while still reflecting the actual work done',
+        '  - Keep the reframing subtle and professional — the experience should feel genuine, not fabricated',
+      );
+    }
+
+    if (hasTools) {
+      lines.push(
+        `- You MAY naturally mention these tools/technologies in older experience bullets where contextually plausible: ${untouchedTools.trim()}`,
+        '  - Only weave them in where the actual tasks would realistically have involved such tools',
+        '  - Do NOT contradict or override any QA-specific tools that must remain (e.g., Selenium, Jira, TestRail)',
+        '  - The goal is to broaden the apparent skill surface without creating obvious contradictions',
+      );
+    }
+
+    lines.push(
+      '- The final resume must read as a cohesive, credible document — every change must feel earned and natural',
+      '- Do NOT add any disclaimer or footnote about changes made',
+    );
+
+    return lines.join('\n');
+  };
+
   // ── Resume Prompt ──────────────────────────────────────────────
   const assembleResumePrompt = () => {
     const resumeText = resumes[mode];
     const isATS = mode === 'ats';
+    const creativeBlock = buildCreativeReframingBlock();
 
     const prompt = isATS
       ? `You are an expert ATS resume optimizer.
@@ -107,7 +154,7 @@ Your task:
 
 - Return ONLY the updated Markdown resume in a single .md compatible code block. No explanations or conversational text.`;
 
-    return `${prompt}
+    return `${prompt}${creativeBlock}
 
 --- MY RESUME ---
 ${resumeText}
@@ -306,7 +353,7 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
           style={{ minHeight: '200px' }}
         />
 
-        <div className="mt-8 flex flex-col gap-5">
+        <div className="flex flex-col gap-5" style={{ marginTop: '1.5rem' }}>
           <div className="flex items-center justify-between px-1">
             <div className="flex flex-col gap-1">
               <span className="text-sm font-semibold transition-colors duration-300" style={{ color: includeCoverLetter ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Need Cover Letter?</span>
@@ -341,6 +388,71 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
                 className={clsx("inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md", includeLeadExtraction ? "translate-x-6" : "translate-x-1")}
               />
             </button>
+          </div>
+
+          {/* ── Divider */}
+          <div style={{ borderTop: '1px solid var(--glass-border)', margin: '0.25rem 0' }} />
+
+          {/* ── Other Job Roles toggle + input ── */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between px-1">
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-semibold transition-colors duration-300" style={{ color: enableOtherRoles ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Reframe Older Experience as…</span>
+                <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>AI will adapt early job roles (not your latest QA role) to these target titles.</span>
+              </div>
+              <button
+                onClick={() => setEnableOtherRoles(v => !v)}
+                className="relative flex items-center h-6 rounded-full w-11 transition-all duration-300 focus:outline-none shrink-0"
+                style={{
+                  background: enableOtherRoles ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--border)',
+                }}
+              >
+                <span
+                  className={clsx("inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md", enableOtherRoles ? "translate-x-6" : "translate-x-1")}
+                />
+              </button>
+            </div>
+            {enableOtherRoles && (
+              <textarea
+                id="other-job-roles"
+                value={otherJobRoles}
+                onChange={e => setOtherJobRoles(e.target.value)}
+                placeholder="e.g. Customer Support Specialist, Technical Support Analyst, IT Help Desk — separate multiple roles with commas"
+                className="input-base"
+                style={{ minHeight: '72px', fontSize: '12px' }}
+              />
+            )}
+          </div>
+
+          {/* ── Unfamiliar Tools toggle + input ── */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between px-1">
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-semibold transition-colors duration-300" style={{ color: enableUntouchedTools ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Weave In Unfamiliar Tools</span>
+                <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>Mentions these tools in older experience bullets where contextually natural — latest QA experience stays untouched.</span>
+              </div>
+              <button
+                onClick={() => setEnableUntouchedTools(v => !v)}
+                className="relative flex items-center h-6 rounded-full w-11 transition-all duration-300 focus:outline-none shrink-0"
+                style={{
+                  background: enableUntouchedTools ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--border)',
+                }}
+              >
+                <span
+                  className={clsx("inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md", enableUntouchedTools ? "translate-x-6" : "translate-x-1")}
+                />
+              </button>
+            </div>
+            {enableUntouchedTools && (
+              <textarea
+                id="unfamiliar-tools"
+                value={untouchedTools}
+                onChange={e => setUntouchedTools(e.target.value)}
+                placeholder="e.g. Zendesk, Salesforce, Freshdesk, HubSpot — separate with commas"
+                className="input-base"
+                style={{ minHeight: '72px', fontSize: '12px' }}
+              />
+            )}
           </div>
         </div>
       </div>
