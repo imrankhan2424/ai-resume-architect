@@ -23,6 +23,9 @@ const PromptGenerator = () => {
   const [enableUntouchedTools, setEnableUntouchedTools] = useState(false);
   const [untouchedTools, setUntouchedTools] = useState('');
 
+  // ── Score .md File State ─────────────────────────────────────────
+  const [enableScoreMd, setEnableScoreMd] = useState(false);
+
   const handleCopyJobDescription = () => {
     if (!jobDescription) return;
     navigator.clipboard.writeText(jobDescription);
@@ -94,6 +97,11 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
     return lines.join('\n');
   };
 
+  // ── Score line (injected into prompt when enabled) ───────────────
+  const scoringLine = enableScoreMd
+    ? `\n- After outputting the resume, act as an ATS system, score it out of 100, and list the exact gaps that must be fixed to obtain a 95+ ATS score. No visual representation, just plain text format.`
+    : '';
+
   // ── Resume Prompt ──────────────────────────────────────────────
   const assembleResumePrompt = () => {
     const resumeText = resumes[mode];
@@ -125,7 +133,7 @@ Your task:
 - ALL company experiences MUST be presented in bullet-point format (-)
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
-- If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit
+- If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
 
 - Return ONLY the updated plain Markdown resume in a single .md compatible code block. No explanations or conversational text.`
       : `You are an expert resume optimizer.
@@ -150,7 +158,7 @@ Your task:
 - ALL company experiences MUST be presented in bullet-point format (-)
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
-- If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit
+- If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
 
 - Return ONLY the updated Markdown resume in a single .md compatible code block. No explanations or conversational text.`;
 
@@ -391,6 +399,28 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
           </div>
 
           {/* ── Divider */}
+          <div style={{ borderTop: '1px solid var(--glass-border)', margin: '0.25rem 0' }} />
+
+          {/* ── Score My .md File toggle ── */}
+          <div className="flex items-center justify-between px-1">
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-semibold transition-colors duration-300" style={{ color: enableScoreMd ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Make 95+</span>
+              <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>AI acts as ATS, scores the resume and lists exact gaps to hit 95+.</span>
+            </div>
+            <button
+              onClick={() => setEnableScoreMd(v => !v)}
+              className="relative flex items-center h-6 rounded-full w-11 transition-all duration-300 focus:outline-none shrink-0"
+              style={{
+                background: enableScoreMd ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--border)',
+              }}
+            >
+              <span
+                className={clsx('inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md', enableScoreMd ? 'translate-x-6' : 'translate-x-1')}
+              />
+            </button>
+          </div>
+
+          {/* ── Divider (before creative reframing) */}
           <div style={{ borderTop: '1px solid var(--glass-border)', margin: '0.25rem 0' }} />
 
           {/* ── Other Job Roles toggle + input ── */}
