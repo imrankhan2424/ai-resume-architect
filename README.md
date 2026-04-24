@@ -14,6 +14,10 @@ Use this tool to automatically generate and format your resume for ATS tracking 
 - **Live Markdown Parsing**: Paste AI outputs back into the app and see them render instantly via `react-markdown`.
 - **1-Click PDF Export**: Built-in CSS print logic. Print your resume, cover letter, or a combined PDF directly from the browser natively, without requiring python scripts or WEasyPrint.
 - **Premium Glassmorphism UI**: Beautiful, interactive dark/light mode UI built with Tailwind CSS.
+- **Make 95+**: Toggle that injects an ATS scoring instruction into the prompt — the AI acts as an ATS, scores the resume out of 100, and lists the exact gaps to fix to hit 95+. Output is plain text, no visual formatting.
+- **Reframe Older Experience**: Toggle that instructs the AI to rewrite older job roles into target titles (e.g. Customer Support, IT Help Desk) while keeping the most recent QA experience completely untouched.
+- **Weave In Unfamiliar Tools**: Toggle that instructs the AI to naturally mention specified tools (e.g. Zendesk, Salesforce) in older experience bullets where contextually plausible, without touching the latest role.
+- **Target HR Lead**: Toggle that generates a separate Lead Intel prompt to extract the recruiter's name, email, company, and location directly from the job description.
 
 ---
 
@@ -58,10 +62,14 @@ npm run build
 ## ⚡ Application Workflow
 
 1. Paste the target **Job Description** into the required field.
-2. Ensure the "Need Cover Letter?" toggle is enabled to generate independent prompts for both a Resume and Cover Letter.
-3. Click **Copy** on the Resume Prompt, paste it into your LLM (Claude/ChatGPT/Gemini), and copy the markdown output into the **AI Result Editor**.
-4. Repeat for the Cover Letter Prompt.
-5. Review the **Live Previews** on the right panel.
-6. Click **Print Resume**, **Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
+2. *(Optional)* Enable **Need Cover Letter?** to also generate a cover letter prompt.
+3. *(Optional)* Enable **Target HR Lead?** to generate a separate prompt that extracts recruiter name, email, and company from the job description.
+4. *(Optional)* Enable **Make 95+** — the AI will act as an ATS, score the resume, and list exact gaps to hit 95+ after generating the resume.
+5. *(Optional)* Enable **Reframe Older Experience** and provide target job titles to have the AI rewrite older roles (not the most recent one) into those titles.
+6. *(Optional)* Enable **Weave In Unfamiliar Tools** and list tools (e.g. Zendesk, Salesforce) to have the AI naturally mention them in older experience bullets.
+7. Click **Copy** on the Resume Prompt, paste it into your LLM (Claude/ChatGPT/Gemini), and copy the markdown output into the **AI Result Editor**.
+8. Repeat for the Cover Letter or Lead Intel prompts if enabled.
+9. Review the **Live Previews** on the right panel.
+10. Click **Print Resume**, **Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
 
 

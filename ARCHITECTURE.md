@@ -87,7 +87,12 @@ ai-resume-architect/
 * **`src/components/MainLayout.jsx`**: The two-column grid layout container holding the application's main functional sections.
 
 ### Feature Components
-* **`src/components/PromptGenerator.jsx`**: The left-hand panel where the user inputs the job description. It dynamically generates robust, independent AI prompts for BOTH the resume and an optional tailormade cover letter, with 1-click copy features, based on the active mode (ATS or Visual).
+* **`src/components/PromptGenerator.jsx`**: The left-hand panel where the user inputs the job description. It dynamically generates robust, mode-aware AI prompts for the resume and optional cover letter/lead extraction, with 1-click copy and expand-to-modal features. Supports five toggleable prompt modifiers:
+  * **Need Cover Letter?** — appends a dedicated cover letter prompt section.
+  * **Target HR Lead?** — generates a Lead Intel prompt to extract recruiter name, email, company, and location from the job description.
+  * **Make 95+** — injects a single ATS scoring instruction into the resume prompt. The AI acts as an ATS, scores the resume out of 100, and lists exact gaps to fix to reach 95+. Plain text output only.
+  * **Reframe Older Experience** — instructs the AI to rewrite older job role titles (not the most recent) into user-specified target roles, while keeping all personal details and latest experience untouched.
+  * **Weave In Unfamiliar Tools** — instructs the AI to naturally mention user-specified tools in older experience bullets where contextually plausible, without altering the most recent role.
 * **`src/components/PDFExport.jsx`**: The right-hand panel where the user pastes the AI-generated markdown. It renders live previews of both documents using distinct, optimized typography for each. It features independent CSS print isolation logic for exporting the Resume, Cover Letter, or a combined PDF natively via the browser.
 
 ### Context & State
