@@ -99,7 +99,7 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
 
   // ── Score line (injected into prompt when enabled) ───────────────
   const scoringLine = enableScoreMd
-    ? `\n- After outputting the resume, act as an ATS system, score it out of 100, and list the exact gaps that must be fixed to obtain a 95+ ATS score. No visual representation, just plain text format.`
+    ? `\n- After outputting the resume, act as an ATS system, score it out of 100, and list the exact gaps that must be fixed to obtain a 95+ ATS score. DO NOT add this scoring/gap analysis inside the .md code block; provide it as a separate plain text format after the .md code block. No visual representation, just plain text format.`
     : '';
 
   // ── Resume Prompt ──────────────────────────────────────────────
