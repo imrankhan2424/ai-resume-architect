@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { createPortal } from 'react-dom';
-import { Printer, Edit3, Settings, ShieldCheck, FileText, Copy, Check, Maximize2, X, UserPlus, Mail, MapPin, Building, UserCheck } from 'lucide-react';
+import { Printer, Edit3, Settings, ShieldCheck, FileText, Copy, Check, Maximize2, X, UserPlus, Mail, MapPin, Building, UserCheck, Trash2 } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
 
 const PDFExport = () => {
@@ -79,14 +79,25 @@ const PDFExport = () => {
             </div>
             <div className="flex items-center gap-2">
               {aiResult && (
-                <button
-                  onClick={() => handleCopyText(aiResult, setCopiedResume)}
-                  className={`btn h-7 px-3 text-[10.5px] transition-all duration-300 ${copiedResume ? 'btn-emerald' : ''}`}
-                  style={!copiedResume ? { background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' } : {}}
-                >
-                  {copiedResume ? <Check size={12} /> : <Copy size={12} />}
-                  <span>{copiedResume ? 'Copied!' : 'Copy'}</span>
-                </button>
+                <>
+                  <button
+                    onClick={() => setAiResult('')}
+                    className="btn h-7 px-3 text-[10.5px] transition-all duration-300"
+                    style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                    title="Clear"
+                  >
+                    <Trash2 size={12} />
+                    <span>Clear</span>
+                  </button>
+                  <button
+                    onClick={() => handleCopyText(aiResult, setCopiedResume)}
+                    className={`btn h-7 px-3 text-[10.5px] transition-all duration-300 ${copiedResume ? 'btn-emerald' : ''}`}
+                    style={!copiedResume ? { background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' } : {}}
+                  >
+                    {copiedResume ? <Check size={12} /> : <Copy size={12} />}
+                    <span>{copiedResume ? 'Copied!' : 'Copy'}</span>
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -111,14 +122,25 @@ const PDFExport = () => {
               </div>
               <div className="flex items-center gap-2">
                 {aiCoverLetterResult && (
-                  <button
-                    onClick={() => handleCopyText(aiCoverLetterResult, setCopiedCoverLetter)}
-                    className={`btn h-7 px-3 text-[10.5px] transition-all duration-300 ${copiedCoverLetter ? 'btn-accent' : ''}`}
-                    style={!copiedCoverLetter ? { background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' } : {}}
-                  >
-                    {copiedCoverLetter ? <Check size={12} /> : <Copy size={12} />}
-                    <span>{copiedCoverLetter ? 'Copied!' : 'Copy'}</span>
-                  </button>
+                  <>
+                    <button
+                      onClick={() => setAiCoverLetterResult('')}
+                      className="btn h-7 px-3 text-[10.5px] transition-all duration-300"
+                      style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                      title="Clear"
+                    >
+                      <Trash2 size={12} />
+                      <span>Clear</span>
+                    </button>
+                    <button
+                      onClick={() => handleCopyText(aiCoverLetterResult, setCopiedCoverLetter)}
+                      className={`btn h-7 px-3 text-[10.5px] transition-all duration-300 ${copiedCoverLetter ? 'btn-accent' : ''}`}
+                      style={!copiedCoverLetter ? { background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' } : {}}
+                    >
+                      {copiedCoverLetter ? <Check size={12} /> : <Copy size={12} />}
+                      <span>{copiedCoverLetter ? 'Copied!' : 'Copy'}</span>
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -144,13 +166,24 @@ const PDFExport = () => {
               </div>
               <div className="flex items-center gap-2">
                 {leadAiResult && (
-                  <button 
-                    onClick={handleProcessLead}
-                    className="btn h-7 px-4 text-[10.5px] bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg transition-all animate-pulse"
-                  >
-                    <UserPlus size={12} />
-                    Process & Save Lead
-                  </button>
+                  <>
+                    <button
+                      onClick={() => setLeadAiResult('')}
+                      className="btn h-7 px-3 text-[10.5px] transition-all duration-300"
+                      style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                      title="Clear"
+                    >
+                      <Trash2 size={12} />
+                      <span>Clear</span>
+                    </button>
+                    <button 
+                      onClick={handleProcessLead}
+                      className="btn h-7 px-4 text-[10.5px] bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg transition-all animate-pulse"
+                    >
+                      <UserPlus size={12} />
+                      Process & Save Lead
+                    </button>
+                  </>
                 )}
               </div>
             </div>

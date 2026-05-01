@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Copy, Check, MessageSquare, Briefcase, Sparkles, FileText, Maximize2, X, Mail, UserCheck, PlusCircle } from 'lucide-react';
+import { Copy, Check, MessageSquare, Briefcase, Sparkles, FileText, Maximize2, X, Mail, UserCheck, PlusCircle, Trash2 } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
 import clsx from 'clsx';
 
@@ -339,14 +339,25 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
           </div>
           <div className="flex items-center gap-2">
             {jobDescription && (
-              <button
-                onClick={handleCopyJobDescription}
-                className={`btn h-7 px-3 text-[10.5px] transition-all duration-300 ${copiedJobDescription ? 'btn-accent' : ''}`}
-                style={!copiedJobDescription ? { background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' } : {}}
-              >
-                {copiedJobDescription ? <Check size={12} /> : <Copy size={12} />}
-                <span>{copiedJobDescription ? 'Copied!' : 'Copy'}</span>
-              </button>
+              <>
+                <button
+                  onClick={() => setJobDescription('')}
+                  className="btn h-7 px-3 text-[10.5px] transition-all duration-300"
+                  style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                  title="Clear"
+                >
+                  <Trash2 size={12} />
+                  <span>Clear</span>
+                </button>
+                <button
+                  onClick={handleCopyJobDescription}
+                  className={`btn h-7 px-3 text-[10.5px] transition-all duration-300 ${copiedJobDescription ? 'btn-accent' : ''}`}
+                  style={!copiedJobDescription ? { background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' } : {}}
+                >
+                  {copiedJobDescription ? <Check size={12} /> : <Copy size={12} />}
+                  <span>{copiedJobDescription ? 'Copied!' : 'Copy'}</span>
+                </button>
+              </>
             )}
             <span className="badge badge-accent">Required</span>
           </div>
@@ -443,14 +454,27 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
               </button>
             </div>
             {enableOtherRoles && (
-              <textarea
-                id="other-job-roles"
-                value={otherJobRoles}
-                onChange={e => setOtherJobRoles(e.target.value)}
-                placeholder="e.g. Customer Support Specialist, Technical Support Analyst, IT Help Desk — separate multiple roles with commas"
-                className="input-base"
-                style={{ minHeight: '72px', fontSize: '12px' }}
-              />
+              <div className="relative">
+                <textarea
+                  id="other-job-roles"
+                  value={otherJobRoles}
+                  onChange={e => setOtherJobRoles(e.target.value)}
+                  placeholder="e.g. Customer Support Specialist, Technical Support Analyst, IT Help Desk — separate multiple roles with commas"
+                  className="input-base"
+                  style={{ minHeight: '72px', fontSize: '12px', paddingRight: otherJobRoles ? '4.5rem' : undefined }}
+                />
+                {otherJobRoles && (
+                  <button
+                    onClick={() => setOtherJobRoles('')}
+                    className="btn h-6 px-2 text-[10px] absolute top-2 right-2 transition-all duration-200"
+                    style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                    title="Clear"
+                  >
+                    <Trash2 size={10} />
+                    <span>Clear</span>
+                  </button>
+                )}
+              </div>
             )}
           </div>
 
@@ -474,14 +498,27 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
               </button>
             </div>
             {enableUntouchedTools && (
-              <textarea
-                id="unfamiliar-tools"
-                value={untouchedTools}
-                onChange={e => setUntouchedTools(e.target.value)}
-                placeholder="e.g. Zendesk, Salesforce, Freshdesk, HubSpot — separate with commas"
-                className="input-base"
-                style={{ minHeight: '72px', fontSize: '12px' }}
-              />
+              <div className="relative">
+                <textarea
+                  id="unfamiliar-tools"
+                  value={untouchedTools}
+                  onChange={e => setUntouchedTools(e.target.value)}
+                  placeholder="e.g. Zendesk, Salesforce, Freshdesk, HubSpot — separate with commas"
+                  className="input-base"
+                  style={{ minHeight: '72px', fontSize: '12px', paddingRight: untouchedTools ? '4.5rem' : undefined }}
+                />
+                {untouchedTools && (
+                  <button
+                    onClick={() => setUntouchedTools('')}
+                    className="btn h-6 px-2 text-[10px] absolute top-2 right-2 transition-all duration-200"
+                    style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                    title="Clear"
+                  >
+                    <Trash2 size={10} />
+                    <span>Clear</span>
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>
