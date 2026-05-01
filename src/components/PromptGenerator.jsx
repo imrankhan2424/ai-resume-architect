@@ -99,7 +99,7 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
 
   // ── Score line (injected into prompt when enabled) ───────────────
   const scoringLine = enableScoreMd
-    ? `\n- After outputting the resume, act as an ATS system, score it out of 100, and list the exact gaps that must be fixed to obtain a 95+ ATS score. DO NOT add this scoring/gap analysis inside the .md code block; provide it as a separate plain text format after the .md code block. No visual representation, just plain text format.`
+    ? `\n- After outputting the resume, act as an ATS system, score it out of 100, and list the exact gaps that must be fixed to obtain a near 100 ATS score. DO NOT add this scoring/gap analysis inside the .md code block; provide it as a separate plain text format after the .md code block. No visual representation, just plain text format.`
     : '';
 
   // ── Resume Prompt ──────────────────────────────────────────────
@@ -404,8 +404,8 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
           {/* ── Score My .md File toggle ── */}
           <div className="flex items-center justify-between px-1">
             <div className="flex flex-col gap-1">
-              <span className="text-sm font-semibold transition-colors duration-300" style={{ color: enableScoreMd ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Make 95+</span>
-              <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>AI acts as ATS, scores the resume and lists exact gaps to hit 95+.</span>
+              <span className="text-sm font-semibold transition-colors duration-300" style={{ color: enableScoreMd ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>Score & Fix to ~100</span>
+              <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>AI acts as ATS, scores the resume and lists exact gaps to hit near 100.</span>
             </div>
             <button
               onClick={() => setEnableScoreMd(v => !v)}
