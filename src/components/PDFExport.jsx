@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { createPortal } from 'react-dom';
+import { createPortal, flushSync } from 'react-dom';
 import { Printer, Edit3, Settings, ShieldCheck, FileText, Copy, Check, Maximize2, X, UserPlus, Mail, MapPin, Building, UserCheck, Trash2 } from 'lucide-react';
 import { useResume } from '../context/ResumeContext';
 
@@ -19,14 +19,31 @@ const PDFExport = () => {
   const [copiedCoverLetter, setCopiedCoverLetter] = useState(false);
   const [copiedLead, setCopiedLead] = useState(false);
   const [modalTarget, setModalTarget] = useState(null); // 'resume' | 'cover' | null
+  const [customFileName, setCustomFileName] = useState('');
 
   const handlePrint = (target, styleOverride = null) => {
-    setPrintTarget(target);
-    setActivePrintStyle(styleOverride);
-    setTimeout(() => {
-      window.print();
-      setTimeout(() => setActivePrintStyle(null), 500);
-    }, 100);
+    flushSync(() => {
+      setPrintTarget(target);
+      setActivePrintStyle(styleOverride);
+    });
+
+    // Save the original title
+    const originalTitle = document.title;
+    
+    // Set the document title to custom so PDF metadata/filename matches
+    document.title = customFileName.trim() || 'Resume';
+
+    const restoreTitle = () => {
+      document.title = originalTitle;
+      setActivePrintStyle(null);
+      window.removeEventListener('afterprint', restoreTitle);
+      window.removeEventListener('focus', restoreTitle);
+    };
+    
+    window.addEventListener('afterprint', restoreTitle);
+    window.addEventListener('focus', restoreTitle);
+
+    window.print();
   };
 
   const handleCopyText = (text, setter) => {
@@ -61,6 +78,7 @@ const PDFExport = () => {
   };
 
   const effectivePrintMode = activePrintStyle || (mode === 'ats' && showVisualPreview ? 'visual' : mode);
+  const effectiveTitle = customFileName.trim();
 
   return (
     <div data-print-target={printTarget} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -206,17 +224,29 @@ const PDFExport = () => {
               </div>
               <span className="text-xs font-bold uppercase tracking-widest text-slate-700">Export Options</span>
             </div>
+
+            <div className="flex flex-col gap-1.5 w-full max-w-sm mb-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest flex justify-between" style={{ color: !effectiveTitle ? 'var(--rose-500)' : 'var(--slate-500)' }}>
+                <span>Save as PDF Name <span className="text-rose-500">*</span></span>
+                {!effectiveTitle && <span className="text-rose-500 lowercase normal-case tracking-normal">Required for export</span>}
+              </label>
+              <input
+                type="text"
+                value={customFileName}
+                onChange={(e) => setCustomFileName(e.target.value)}
+                placeholder="e.g. Imran Khan - Senior QA Engineer"
+                className={`input-base text-sm py-1.5 px-3 transition-colors ${!effectiveTitle ? 'border-rose-300 bg-rose-50 focus:border-rose-400 focus:ring-rose-200' : ''}`}
+                style={{ height: '36px' }}
+              />
+            </div>
             
             <div className="flex flex-wrap gap-4 items-center">
               <div className="flex flex-wrap gap-2">
-                <button onClick={() => handlePrint('resume')} className="btn btn-emerald h-9 px-4 text-xs" disabled={!aiResult}><Printer size={14} />Print Resume</button>
-                {mode === 'ats' && (
-                  <button onClick={() => handlePrint('resume', 'visual')} className="btn btn-emerald h-9 px-4 text-xs" disabled={!aiResult}><Printer size={14} />Print (Visual Design)</button>
-                )}
+                <button onClick={() => handlePrint('resume')} className="btn btn-emerald h-9 px-4 text-xs" disabled={!aiResult || !effectiveTitle}><Printer size={14} />Save / Print Resume</button>
                 {includeCoverLetter && (
                   <>
-                    <button onClick={() => handlePrint('cover-letter')} className="btn btn-primary h-9 px-4 text-xs" disabled={!aiCoverLetterResult}><Printer size={14} />Print Cover Letter</button>
-                    <button onClick={() => handlePrint('both')} className="btn text-white h-9 px-4 text-xs" style={{ background: 'linear-gradient(135deg, var(--emerald) 0%, var(--accent) 100%)' }} disabled={!aiResult || !aiCoverLetterResult}><Printer size={14} />Export Combined PDF</button>
+                    <button onClick={() => handlePrint('cover-letter')} className="btn btn-primary h-9 px-4 text-xs" disabled={!aiCoverLetterResult || !effectiveTitle}><Printer size={14} />Save / Print Cover Letter</button>
+                    <button onClick={() => handlePrint('both')} className="btn text-white h-9 px-4 text-xs" style={{ background: 'linear-gradient(135deg, var(--emerald) 0%, var(--accent) 100%)' }} disabled={!aiResult || !aiCoverLetterResult || !effectiveTitle}><Printer size={14} />Export Combined PDF</button>
                   </>
                 )}
               </div>

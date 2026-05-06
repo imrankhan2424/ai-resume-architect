@@ -12,7 +12,7 @@ Use this tool to automatically generate and format your resume for ATS tracking 
 - **Integrated Prompts**: No more copy-pasting from text files. The app dynamically generates exact prompts for ChatGPT/Claude based on your resume and job description.
 - **Cover Letter Engine**: Dedicated mode to generate beautiful, professional cover letters alongside your resume, with bespoke typography.
 - **Live Markdown Parsing**: Paste AI outputs back into the app and see them render instantly via `react-markdown`.
-- **1-Click PDF Export**: Built-in CSS print logic. Print your resume, cover letter, or a combined PDF directly from the browser natively, without requiring python scripts or WEasyPrint.
+- **1-Click PDF Export**: Built-in CSS print logic. Export your resume, cover letter, or a combined PDF directly from the browser natively. Features strict metadata handling and mandatory file naming to ensure your exported PDFs always have clean, professional titles (no weird browser tabs or default app names in ATS systems!).
 - **Premium Glassmorphism UI**: Beautiful, interactive dark/light mode UI built with Tailwind CSS.
 - **Make 95+**: Toggle that injects an ATS scoring instruction into the prompt — the AI acts as an ATS, scores the resume out of 100, and lists the exact gaps to fix to hit 95+. Output is plain text, no visual formatting.
 - **Reframe Older Experience**: Toggle that instructs the AI to rewrite older job roles into target titles (e.g. Customer Support, IT Help Desk) while keeping the most recent QA experience completely untouched.
@@ -70,6 +70,6 @@ npm run build
 7. Click **Copy** on the Resume Prompt, paste it into your LLM (Claude/ChatGPT/Gemini), and copy the markdown output into the **AI Result Editor**.
 8. Repeat for the Cover Letter or Lead Intel prompts if enabled.
 9. Review the **Live Previews** on the right panel.
-10. Click **Print Resume**, **Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
-
+10. Fill out the mandatory **Save as PDF Name** field in the Export Options. This ensures your file saves correctly and the internal PDF metadata looks completely professional to hiring managers.
+11. Click **Save / Print Resume**, **Save / Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
 
