@@ -24,10 +24,12 @@ graph TD
     %% Main Layout
     MainLayout --> PromptGenerator[src/components/PromptGenerator.jsx]
     MainLayout --> PDFExport[src/components/PDFExport.jsx]
+    MainLayout --> ContactHub[src/components/ContactHub.jsx]
     
     %% Features
     PromptGenerator --> ResumeContext
     PDFExport --> ResumeContext
+    ContactHub --> ResumeContext
     
     %% Context & Config
     ResumeContext --> defaults[src/config/defaults.json]
@@ -41,7 +43,7 @@ graph TD
     classDef config fill:#334155,stroke:#94a3b8,stroke-width:2px,color:#fff;
     classDef entry fill:#b45309,stroke:#fbbf24,stroke-width:2px,color:#fff;
 
-    class App,Header,MainLayout,PromptGenerator,PDFExport component;
+    class App,Header,MainLayout,PromptGenerator,PDFExport,ContactHub component;
     class ResumeContext,defaults context;
     class viteConfig,postcssConfig config;
     class index,main,css entry;
@@ -53,6 +55,7 @@ graph TD
 ai-resume-architect/
 ├── src/
 │   ├── components/
+│   │   ├── ContactHub.jsx
 │   │   ├── Header.jsx
 │   │   ├── MainLayout.jsx
 │   │   ├── PDFExport.jsx
@@ -89,11 +92,12 @@ ai-resume-architect/
 ### Feature Components
 * **`src/components/PromptGenerator.jsx`**: The left-hand panel where the user inputs the job description. It dynamically generates robust, mode-aware AI prompts for the resume and optional cover letter/lead extraction, with 1-click copy and expand-to-modal features. Supports five toggleable prompt modifiers:
   * **Need Cover Letter?** — appends a dedicated cover letter prompt section.
-  * **Target HR Lead?** — generates a Lead Intel prompt to extract recruiter name, email, company, and location from the job description.
-  * **Make 95+** — injects a single ATS scoring instruction into the resume prompt. The AI acts as an ATS, scores the resume out of 100, and lists exact gaps to fix to reach 95+. Plain text output only.
-  * **Reframe Older Experience** — instructs the AI to rewrite older job role titles (not the most recent) into user-specified target roles, while keeping all personal details and latest experience untouched.
-  * **Weave In Unfamiliar Tools** — instructs the AI to naturally mention user-specified tools in older experience bullets where contextually plausible, without altering the most recent role.
-* **`src/components/PDFExport.jsx`**: The right-hand panel where the user pastes the AI-generated markdown. It renders live previews of both documents using distinct, optimized typography for each. It features independent CSS print isolation logic for exporting the Resume, Cover Letter, or a combined PDF natively via the browser. Crucially, it manages strict PDF Title metadata by requiring a manual filename input and synchronously overriding the DOM `document.title` via `flushSync` before triggering the print dialog, ensuring ATS systems and recruiters see a professional filename in the PDF properties.
+  * **Target HR Lead?** — generates a Lead Intel prompt to extract recruiter name, email, company, and location from the job description for the ContactHub.
+  * **Score & Fix to ~100** — injects a single ATS scoring instruction into the resume prompt. The AI acts as an ATS, scores the generated resume out of 100, and lists exact gaps to fix to reach 95+.
+  * **Reframe Older Experience** — instructs the AI to rewrite older job role titles (not the most recent) into user-specified target roles.
+  * **Weave In Unfamiliar Tools** — instructs the AI to naturally mention user-specified tools in older experience bullets where contextually plausible.
+* **`src/components/PDFExport.jsx`**: The right-hand panel where the user pastes the AI-generated markdown. It renders live previews of both documents using distinct, optimized typography for each. It features independent CSS print isolation logic for exporting the Resume, Cover Letter, or a combined PDF natively via the browser. Crucially, it manages strict PDF Title metadata by requiring a manual filename input and synchronously overriding the DOM `document.title` via `flushSync` before triggering the print dialog. Also includes the **Lead Outreach Editor** to process AI-extracted HR contacts into the global state.
+* **`src/components/ContactHub.jsx`**: A persistent dashboard at the bottom of the layout that displays and manages saved HR leads. It features search, manual editing, "Reach Out" links, and CSV export functionality for recruitment tracking.
 
 ### Context & State
 * **`src/context/ResumeContext.jsx`**: The global state manager (using React Context). It handles persisting data to `localStorage` (theme, mode, AI results, and resume texts) so user progress isn't lost on refresh.

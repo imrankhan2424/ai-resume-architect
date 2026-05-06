@@ -12,12 +12,15 @@ Use this tool to automatically generate and format your resume for ATS tracking 
 - **Integrated Prompts**: No more copy-pasting from text files. The app dynamically generates exact prompts for ChatGPT/Claude based on your resume and job description.
 - **Cover Letter Engine**: Dedicated mode to generate beautiful, professional cover letters alongside your resume, with bespoke typography.
 - **Live Markdown Parsing**: Paste AI outputs back into the app and see them render instantly via `react-markdown`.
-- **1-Click PDF Export**: Built-in CSS print logic. Export your resume, cover letter, or a combined PDF directly from the browser natively. Features strict metadata handling and mandatory file naming to ensure your exported PDFs always have clean, professional titles (no weird browser tabs or default app names in ATS systems!).
-- **Premium Glassmorphism UI**: Beautiful, interactive dark/light mode UI built with Tailwind CSS.
-- **Make 95+**: Toggle that injects an ATS scoring instruction into the prompt — the AI acts as an ATS, scores the resume out of 100, and lists the exact gaps to fix to hit 95+. Output is plain text, no visual formatting.
-- **Reframe Older Experience**: Toggle that instructs the AI to rewrite older job roles into target titles (e.g. Customer Support, IT Help Desk) while keeping the most recent QA experience completely untouched.
-- **Weave In Unfamiliar Tools**: Toggle that instructs the AI to naturally mention specified tools (e.g. Zendesk, Salesforce) in older experience bullets where contextually plausible, without touching the latest role.
-- **Target HR Lead**: Toggle that generates a separate Lead Intel prompt to extract the recruiter's name, email, company, and location directly from the job description.
+- **1-Click PDF Export**: Built-in CSS print logic. Export your resume, cover letter, or a combined PDF directly from the browser natively. Features strict metadata handling and mandatory file naming via `flushSync` to ensure your exported PDFs always have clean, professional titles.
+- **HR Outreach Hub**: Persistent lead tracking system that extracts recruiter details (name, email, company) from job descriptions and saves them to local storage. Features 1-click CSV export and "Reach Out" mailto links.
+- **Premium Glassmorphism UI**: Beautiful, interactive dark/light mode UI built with Tailwind CSS v4.
+- **5 Advanced Prompt Modifiers**:
+  - **Make 95+**: Injects an ATS scoring instruction into the prompt—the AI acts as an ATS, scores the resume out of 100, and lists exact gaps to fix.
+  - **Reframe Older Experience**: Instructs the AI to rewrite older job roles into target titles while keeping the most recent experience untouched.
+  - **Weave In Unfamiliar Tools**: Naturally mentions specified tools in older experience bullets where contextually plausible.
+  - **Target HR Lead**: Generates a separate Lead Intel prompt to extract recruiter info directly into the Outreach Hub.
+  - **Need Cover Letter?**: Appends a dedicated cover letter prompt section tailored to the role.
 
 ---
 
@@ -70,6 +73,7 @@ npm run build
 7. Click **Copy** on the Resume Prompt, paste it into your LLM (Claude/ChatGPT/Gemini), and copy the markdown output into the **AI Result Editor**.
 8. Repeat for the Cover Letter or Lead Intel prompts if enabled.
 9. Review the **Live Previews** on the right panel.
-10. Fill out the mandatory **Save as PDF Name** field in the Export Options. This ensures your file saves correctly and the internal PDF metadata looks completely professional to hiring managers.
-11. Click **Save / Print Resume**, **Save / Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
+10. If **Target HR Lead** was enabled, paste the AI extraction into the **Lead Outreach Editor** and click **Process & Save Lead** to persist them to the **HR Outreach Hub** at the bottom of the page.
+11. Fill out the mandatory **Save as PDF Name** field in the Export Options. This ensures your file saves correctly and the internal PDF metadata looks completely professional to hiring managers.
+12. Click **Save / Print Resume**, **Save / Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
 
