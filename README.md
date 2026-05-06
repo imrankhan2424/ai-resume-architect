@@ -16,7 +16,7 @@ Use this tool to automatically generate and format your resume for ATS tracking 
 - **HR Outreach Hub**: Persistent lead tracking system that extracts recruiter details (name, email, company) from job descriptions and saves them to local storage. Features 1-click CSV export and "Reach Out" mailto links.
 - **Premium Glassmorphism UI**: Beautiful, interactive dark/light mode UI built with Tailwind CSS v4.
 - **5 Advanced Prompt Modifiers**:
-  - **Make 95+**: Injects an ATS scoring instruction into the prompt—the AI acts as an ATS, scores the resume out of 100, and lists exact gaps to fix.
+  - **Score & Fix to ~100**: Injects an ATS scoring instruction into the prompt—the AI acts as an ATS, scores the resume out of 100, and lists exact gaps to fix.
   - **Reframe Older Experience**: Instructs the AI to rewrite older job roles into target titles while keeping the most recent experience untouched.
   - **Weave In Unfamiliar Tools**: Naturally mentions specified tools in older experience bullets where contextually plausible.
   - **Target HR Lead**: Generates a separate Lead Intel prompt to extract recruiter info directly into the Outreach Hub.
@@ -67,7 +67,7 @@ npm run build
 1. Paste the target **Job Description** into the required field.
 2. *(Optional)* Enable **Need Cover Letter?** to also generate a cover letter prompt.
 3. *(Optional)* Enable **Target HR Lead?** to generate a separate prompt that extracts recruiter name, email, and company from the job description.
-4. *(Optional)* Enable **Make 95+** — the AI will act as an ATS, score the resume, and list exact gaps to hit 95+ after generating the resume.
+4. *(Optional)* Enable **Score & Fix to ~100** — the AI will act as an ATS, score the resume, and list exact gaps to hit ~100 after generating the resume.
 5. *(Optional)* Enable **Reframe Older Experience** and provide target job titles to have the AI rewrite older roles (not the most recent one) into those titles.
 6. *(Optional)* Enable **Weave In Unfamiliar Tools** and list tools (e.g. Zendesk, Salesforce) to have the AI naturally mention them in older experience bullets.
 7. Click **Copy** on the Resume Prompt, paste it into your LLM (Claude/ChatGPT/Gemini), and copy the markdown output into the **AI Result Editor**.
