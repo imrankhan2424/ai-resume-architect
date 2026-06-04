@@ -135,7 +135,7 @@ Your task:
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
-- [TEMPORARY] Keep BOTH phone numbers in the contact line: the India number already in the resume AND +971 557136048 (UAE — sister's number, used for callback while temporarily in India)
+- [TEMPORARY] Keep ALL THREE phone numbers in the contact line: the India number already in the resume AND +971557136048 AND +971589346738 (both UAE numbers — for callback while temporarily in India)
 
 - Return ONLY the updated plain Markdown resume in a single .md compatible code block. No explanations or conversational text.`
       : `You are an expert resume optimizer.
@@ -162,7 +162,7 @@ Your task:
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
-- [TEMPORARY] Keep BOTH phone numbers in the contact line: the India number already in the resume AND +971 557136048 (UAE — sister's number, used for callback while temporarily in India)
+- [TEMPORARY] Keep ALL THREE phone numbers in the contact line: the India number already in the resume AND +971557136048 AND +971589346738 (both UAE numbers — for callback while temporarily in India)
 
 - Return ONLY the updated Markdown resume in a single .md compatible code block. No explanations or conversational text.`;
 
