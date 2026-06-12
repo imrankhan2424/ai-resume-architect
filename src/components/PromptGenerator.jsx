@@ -23,6 +23,9 @@ const PromptGenerator = () => {
   const [enableUntouchedTools, setEnableUntouchedTools] = useState(false);
   const [untouchedTools, setUntouchedTools] = useState('');
 
+  // ── Keyword Audit State ──────────────────────────────────────────
+  const [enableKeywordAudit, setEnableKeywordAudit] = useState(false);
+
   // ── Score .md File State ─────────────────────────────────────────
   const [enableScoreMd, setEnableScoreMd] = useState(false);
 
@@ -108,14 +111,25 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
     const isATS = mode === 'ats';
     const creativeBlock = buildCreativeReframingBlock();
 
+    const auditBlockResume = enableKeywordAudit
+      ? `\nSTEP 1 — OUTPUT A KEYWORD AUDIT BLOCK FIRST (plain text, outside any code block):\nScan the full job description and extract every meaningful keyword: skills, tools, technologies, methodologies, certifications, soft skills, and domain-specific phrases. Then cross-reference them against the resume and output this exact block before anything else:\n\n## KEYWORD AUDIT\n**Must-Match (applied verbatim):** [comma-separated list of JD keywords that exist in or were added to the resume]\n**Skill Gaps Applied:** [keyword → added to: section name — for each new keyword inserted]\n**Skipped (not applicable):** [keywords from JD that genuinely don't fit the candidate's background — with one-line reason]\n\nSTEP 2 — OUTPUT THE REWRITTEN RESUME:\nUsing the committed keyword list above, rewrite the resume so every "Must-Match" keyword appears naturally. Then:`
+      : `\nYour task:`;
+
+    const returnInstructionATS = enableKeywordAudit
+      ? `- Return the KEYWORD AUDIT block (plain text) followed immediately by the updated plain Markdown resume in a single .md compatible code block. No other explanations or conversational text.`
+      : `- Return ONLY the updated plain Markdown resume in a single .md compatible code block. No explanations or conversational text.`;
+
+    const returnInstructionVisual = enableKeywordAudit
+      ? `- Return the KEYWORD AUDIT block (plain text) followed immediately by the updated Markdown resume in a single .md compatible code block. No other explanations or conversational text.`
+      : `- Return ONLY the updated Markdown resume in a single .md compatible code block. No explanations or conversational text.`;
+
     const prompt = isATS
       ? `You are an expert ATS resume optimizer.
 
 I will give you:
 1. My resume in plain Markdown format (no icons, no heavy formatting)
 2. A job description
-
-Your task:
+${auditBlockResume}
 - Rewrite the resume to maximize ATS compatibility and keyword match
 - Keep the language highly professional and tailored to ensure it passes both ATS scanners with a high score and impresses HR reviewers
 - Mirror exact keywords, phrases, and terminology from the job description
@@ -137,14 +151,13 @@ Your task:
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
 - [TEMPORARY] Keep ALL THREE phone numbers in the contact line: the India number already in the resume AND +971557136048 AND +971589346738 (both UAE numbers — for callback while temporarily in India)
 
-- Return ONLY the updated plain Markdown resume in a single .md compatible code block. No explanations or conversational text.`
+${returnInstructionATS}`
       : `You are an expert resume optimizer.
 
 I will give you:
 1. My resume in Markdown format (with formatting, emojis, and section structure intact)
 2. A job description
-
-Your task:
+${auditBlockResume}
 - Rewrite bullet points to align with the job description requirements
 - Keep the language highly professional and tailored to ensure it passes both ATS scanners with a high score and impresses HR reviewers
 - Use strong action verbs and quantifiable achievements where possible
@@ -164,7 +177,7 @@ Your task:
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
 - [TEMPORARY] Keep ALL THREE phone numbers in the contact line: the India number already in the resume AND +971557136048 AND +971589346738 (both UAE numbers — for callback while temporarily in India)
 
-- Return ONLY the updated Markdown resume in a single .md compatible code block. No explanations or conversational text.`;
+${returnInstructionVisual}`;
 
     return `${prompt}${creativeBlock}
 
@@ -185,7 +198,7 @@ I will give you:
 1. My resume
 2. A job description
 
-Your task:
+${enableKeywordAudit ? `STEP 1 — OUTPUT A KEYWORD AUDIT BLOCK FIRST (plain text, outside any code block):\nScan the full job description and extract every meaningful keyword: skills, tools, technologies, methodologies, soft skills, and domain-specific phrases. Cross-reference against the candidate's resume and output this exact block before anything else:\n\n## KEYWORD AUDIT\n**Must-Match (woven into letter):** [comma-separated list of JD keywords that will appear in the cover letter]\n**Skipped (not applicable):** [keywords from JD that genuinely don't fit the candidate's background — with one-line reason]\n\nSTEP 2 — OUTPUT THE COVER LETTER:\nUsing the committed keyword list above, write the cover letter so every "Must-Match" keyword appears naturally in the prose. Then:` : `Your task:`}
 - Write a professional, compelling cover letter tailored to the job description
 - The system will directly parse your Markdown using ReactMarkdown and print it as a structured PDF
 - Extract the company name, hiring manager (if available), and target role from the job description automatically
@@ -210,7 +223,7 @@ FORMATTING RULES:
 - Constrain the total length so the cover letter fits perfectly within one A4 page
 - Do NOT use tables, columns, emojis, or any special characters
 
-- Return ONLY the cover letter in a single .md compatible code block. No explanations or conversational text.
+${enableKeywordAudit ? `- Return the KEYWORD AUDIT block (plain text) followed immediately by the cover letter in a single .md compatible code block. No other explanations or conversational text.` : `- Return ONLY the cover letter in a single .md compatible code block. No explanations or conversational text.`}
 
 --- MY RESUME ---
 ${resumeText}
@@ -415,6 +428,25 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
 
           {/* ── Divider */}
           <div style={{ borderTop: '1px solid var(--glass-border)', margin: '0.25rem 0' }} />
+
+          {/* ── JD Keyword Audit toggle ── */}
+          <div className="flex items-center justify-between px-1">
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-semibold transition-colors duration-300" style={{ color: enableKeywordAudit ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}>JD Keyword Audit</span>
+              <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>AI outputs a keyword audit (Must-Match / Gaps / Skipped) before writing — maximizes ATS coverage.</span>
+            </div>
+            <button
+              onClick={() => setEnableKeywordAudit(v => !v)}
+              className="relative flex items-center h-6 rounded-full w-11 transition-all duration-300 focus:outline-none shrink-0"
+              style={{
+                background: enableKeywordAudit ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--border)',
+              }}
+            >
+              <span
+                className={clsx('inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md', enableKeywordAudit ? 'translate-x-6' : 'translate-x-1')}
+              />
+            </button>
+          </div>
 
           {/* ── Score My .md File toggle ── */}
           <div className="flex items-center justify-between px-1">

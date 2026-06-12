@@ -90,7 +90,8 @@ ai-resume-architect/
 * **`src/components/MainLayout.jsx`**: The two-column grid layout container holding the application's main functional sections.
 
 ### Feature Components
-* **`src/components/PromptGenerator.jsx`**: The left-hand panel where the user inputs the job description. It dynamically generates robust, mode-aware AI prompts for the resume and optional cover letter/lead extraction, with 1-click copy and expand-to-modal features. Supports five toggleable prompt modifiers:
+* **`src/components/PromptGenerator.jsx`**: The left-hand panel where the user inputs the job description. It dynamically generates robust, mode-aware AI prompts for the resume and optional cover letter/lead extraction, with 1-click copy and expand-to-modal features. Supports six toggleable prompt modifiers:
+  * **JD Keyword Audit** — injects a chain-of-thought keyword audit into the prompt. The AI extracts every meaningful keyword/skill/tool from the JD, outputs a structured `## KEYWORD AUDIT` block (Must-Match / Skill Gaps Applied / Skipped) as a committed scratchpad, then writes the document using that list. Applies to resume and cover letter prompts. Off by default.
   * **Need Cover Letter?** — appends a dedicated cover letter prompt section.
   * **Target HR Lead?** — generates a Lead Intel prompt to extract recruiter name, email, company, and location from the job description for the ContactHub.
   * **Score & Fix to ~100** — injects a single ATS scoring instruction into the resume prompt. The AI acts as an ATS, scores the generated resume out of 100, and lists exact gaps to fix to reach 95+.

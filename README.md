@@ -15,7 +15,8 @@ Use this tool to automatically generate and format your resume for ATS tracking 
 - **1-Click PDF Export**: Built-in CSS print logic. Export your resume, cover letter, or a combined PDF directly from the browser natively. Features strict metadata handling and mandatory file naming via `flushSync` to ensure your exported PDFs always have clean, professional titles.
 - **HR Outreach Hub**: Persistent lead tracking system that extracts recruiter details (name, email, company) from job descriptions and saves them to local storage. Features 1-click CSV export and "Reach Out" mailto links.
 - **Premium Glassmorphism UI**: Beautiful, interactive dark/light mode UI built with Tailwind CSS v4.
-- **5 Advanced Prompt Modifiers**:
+- **6 Advanced Prompt Modifiers**:
+  - **JD Keyword Audit**: Injects a chain-of-thought keyword audit into the prompt — the AI extracts every meaningful keyword from the JD, outputs a structured audit block (Must-Match / Skill Gaps Applied / Skipped), then writes the document using that committed list. Maximizes ATS keyword coverage. Off by default.
   - **Score & Fix to ~100**: Injects an ATS scoring instruction into the prompt—the AI acts as an ATS, scores the resume out of 100, and lists exact gaps to fix.
   - **Reframe Older Experience**: Instructs the AI to rewrite older job roles into target titles while keeping the most recent experience untouched.
   - **Weave In Unfamiliar Tools**: Naturally mentions specified tools in older experience bullets where contextually plausible.
@@ -67,13 +68,14 @@ npm run build
 1. Paste the target **Job Description** into the required field.
 2. *(Optional)* Enable **Need Cover Letter?** to also generate a cover letter prompt.
 3. *(Optional)* Enable **Target HR Lead?** to generate a separate prompt that extracts recruiter name, email, and company from the job description.
-4. *(Optional)* Enable **Score & Fix to ~100** — the AI will act as an ATS, score the resume, and list exact gaps to hit ~100 after generating the resume.
-5. *(Optional)* Enable **Reframe Older Experience** and provide target job titles to have the AI rewrite older roles (not the most recent one) into those titles.
-6. *(Optional)* Enable **Weave In Unfamiliar Tools** and list tools (e.g. Zendesk, Salesforce) to have the AI naturally mention them in older experience bullets.
-7. Click **Copy** on the Resume Prompt, paste it into your LLM (Claude/ChatGPT/Gemini), and copy the markdown output into the **AI Result Editor**.
-8. Repeat for the Cover Letter or Lead Intel prompts if enabled.
-9. Review the **Live Previews** on the right panel.
-10. If **Target HR Lead** was enabled, paste the AI extraction into the **Lead Outreach Editor** and click **Process & Save Lead** to persist them to the **HR Outreach Hub** at the bottom of the page.
-11. Fill out the mandatory **Save as PDF Name** field in the Export Options. This ensures your file saves correctly and the internal PDF metadata looks completely professional to hiring managers.
-12. Click **Save / Print Resume**, **Save / Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
+4. *(Optional)* Enable **JD Keyword Audit** — the AI will output a structured keyword audit (Must-Match / Skill Gaps Applied / Skipped) before writing, ensuring maximum ATS keyword coverage. Best enabled for competitive roles.
+5. *(Optional)* Enable **Score & Fix to ~100** — the AI will act as an ATS, score the resume, and list exact gaps to hit ~100 after generating the resume.
+6. *(Optional)* Enable **Reframe Older Experience** and provide target job titles to have the AI rewrite older roles (not the most recent one) into those titles.
+7. *(Optional)* Enable **Weave In Unfamiliar Tools** and list tools (e.g. Zendesk, Salesforce) to have the AI naturally mention them in older experience bullets.
+8. Click **Copy** on the Resume Prompt, paste it into your LLM (Claude/ChatGPT/Gemini), and copy the markdown output into the **AI Result Editor**.
+9. Repeat for the Cover Letter or Lead Intel prompts if enabled.
+10. Review the **Live Previews** on the right panel.
+11. If **Target HR Lead** was enabled, paste the AI extraction into the **Lead Outreach Editor** and click **Process & Save Lead** to persist them to the **HR Outreach Hub** at the bottom of the page.
+12. Fill out the mandatory **Save as PDF Name** field in the Export Options. This ensures your file saves correctly and the internal PDF metadata looks completely professional to hiring managers.
+13. Click **Save / Print Resume**, **Save / Print Cover Letter**, or **Export Combined PDF** and use your browser's "Save as PDF" function (ensure margins are set to default/none).
 
