@@ -146,6 +146,7 @@ ${auditBlockResume}
 - Ensure job titles, company names, and dates remain exactly as provided
 - ALL company experiences MUST be presented in bullet-point format (-)
 - The resume title/headline (the second line, directly below the candidate's name) MUST exactly match the target job title from the job description — update it every time
+- Ensure all year/duration ranges are wrapped in parentheses — e.g. (2021 – 2023), (2025 – Present)
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
@@ -172,6 +173,7 @@ ${auditBlockResume}
 - Keep the output in the same Markdown format
 - ALL company experiences MUST be presented in bullet-point format (-)
 - The resume title/headline (the second line, directly below the candidate's name) MUST exactly match the target job title from the job description — update it every time
+- Ensure all year/duration ranges are wrapped in parentheses — e.g. (2021 – 2023), (2025 – Present)
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
