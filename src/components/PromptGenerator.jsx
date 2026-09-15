@@ -147,7 +147,7 @@ ${auditBlockResume}
 - ALL company experiences MUST be presented in bullet-point format (-)
 - The resume title/headline (the second line, directly below the candidate's name) MUST exactly match the target job title from the job description — update it every time
 - Ensure all year/duration ranges are wrapped in parentheses — e.g. (2021 – 2023), (2025 – Present)
-- EDUCATION & CERTIFICATIONS — copy these sections VERBATIM from the source resume. Do NOT reword, reorder, abbreviate, or add anything. The degree names, institution names, and year ranges must appear character-for-character exactly as they are in the resume provided
+- EDUCATION & CERTIFICATIONS — copy these sections VERBATIM from the source resume. Do NOT reword, reorder, abbreviate, or add anything. The degree names, institution names, and year ranges must appear character-for-character exactly as they are in the resume provided. CRITICAL: year ranges in the Education section use parentheses — e.g. (2016 - 2020) — preserve this format exactly, do NOT strip or reformat the parentheses
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
@@ -175,7 +175,7 @@ ${auditBlockResume}
 - ALL company experiences MUST be presented in bullet-point format (-)
 - The resume title/headline (the second line, directly below the candidate's name) MUST exactly match the target job title from the job description — update it every time
 - Ensure all year/duration ranges are wrapped in parentheses — e.g. (2021 – 2023), (2025 – Present)
-- EDUCATION & CERTIFICATIONS — copy these sections VERBATIM from the source resume. Do NOT reword, reorder, abbreviate, or add anything. The degree names, institution names, and year ranges must appear character-for-character exactly as they are in the resume provided
+- EDUCATION & CERTIFICATIONS — copy these sections VERBATIM from the source resume. Do NOT reword, reorder, abbreviate, or add anything. The degree names, institution names, and year ranges must appear character-for-character exactly as they are in the resume provided. CRITICAL: year ranges in the Education section use parentheses — e.g. (2016 - 2020) — preserve this format exactly, do NOT strip or reformat the parentheses
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
 - If an experience block gets cropped between two A4 pages, adjust the content length or instruct to shift it to the next page
 - If the content cannot fit within 2 pages normally, adjust the sections and brevity to make it fit${scoringLine}
