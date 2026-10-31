@@ -399,7 +399,7 @@ const PDFExport = () => {
         }
         .resume-sheet .profile-photo-overlay {
           position: absolute;
-          top: calc(var(--resume-pad) + 40.5pt - var(--photo-size));
+          top: calc(var(--resume-pad) + 44pt - var(--photo-size));
           right: var(--resume-pad);
           width: var(--photo-size);
           height: var(--photo-size);
@@ -415,11 +415,15 @@ const PDFExport = () => {
         }
 
         .markdown-render { color: #1e1b4b; }
-        .markdown-render h1 { font-size: 24pt; margin-top: 0; margin-bottom: 2pt; line-height: 1.1; font-weight: 800; color: #1e1b4b; }
+        .markdown-render h1 { font-size: 24pt; margin-top: 0; margin-bottom: 4pt; line-height: 1.15; font-weight: 800; color: #1e1b4b; }
         .markdown-render h2 { font-size: 11pt; border-bottom: 1.5px solid #ede9fe; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 4pt; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: #4c1d95; }
-        .markdown-render h3 { font-size: 10.5pt; margin-top: 8pt; margin-bottom: 1pt; font-weight: 700; color: #1e1b4b; }
-        .markdown-render h1 + h3 { margin-top: 2pt; margin-bottom: 2pt; line-height: 1.3; }
-        .markdown-render p { font-size: 9.5pt; margin-bottom: 4pt; color: #374151; line-height: 1.5; }
+        .markdown-render h2:first-of-type,
+        .markdown-render h1 ~ h2:first-of-type { margin-top: 12pt; }
+        .markdown-render h3 { font-size: 10.5pt; margin-top: 8pt; margin-bottom: 2pt; font-weight: 700; color: #1e1b4b; }
+        .markdown-render h1 + h3 { margin-top: 4pt; margin-bottom: 4pt; line-height: 1.35; }
+        .markdown-render h1 + p,
+        .markdown-render h1 + h3 + p { margin-top: 4pt; margin-bottom: 4pt; line-height: 1.45; }
+        .markdown-render p { font-size: 9.5pt; margin-top: 0; margin-bottom: 4pt; color: #374151; line-height: 1.45; }
         .markdown-render ul { margin-bottom: 6pt; padding-left: 14pt; list-style-type: disc; }
         .markdown-render li { font-size: 9.5pt; margin-bottom: 2pt; color: #374151; line-height: 1.45; }
         .markdown-render hr { border: none; border-top: 1px solid #ede9fe; margin: 8pt 0; }
@@ -459,7 +463,7 @@ const PDFExport = () => {
           }
           .resume-sheet .profile-photo-overlay {
             position: absolute !important;
-            top: calc(0.5in + 40.5pt - var(--photo-size)) !important;
+            top: calc(0.5in + 44pt - var(--photo-size)) !important;
             right: 0.5in !important;
             width: var(--photo-size) !important;
             height: var(--photo-size) !important;
