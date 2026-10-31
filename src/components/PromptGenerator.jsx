@@ -1,14 +1,31 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Copy, Check, MessageSquare, Briefcase, Sparkles, FileText, Maximize2, X, Mail, UserCheck, PlusCircle, Trash2 } from 'lucide-react';
+import { Copy, Check, MessageSquare, Briefcase, Sparkles, FileText, Maximize2, X, Mail, UserCheck, PlusCircle, Trash2, Image, Upload, RotateCcw } from 'lucide-react';
+import defaultProfilePhoto from '../assets/profile.jpg';
 import { useResume } from '../context/ResumeContext';
 import clsx from 'clsx';
 
 const PromptGenerator = () => {
+  const photoInputRef = React.useRef(null);
+
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setCustomPhoto(event.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
   const { 
     mode, resumes, jobDescription, setJobDescription, 
     includeCoverLetter, setIncludeCoverLetter,
-    includeLeadExtraction, setIncludeLeadExtraction 
+    includeLeadExtraction, setIncludeLeadExtraction,
+    includePhoto, setIncludePhoto,
+    photoSize, setPhotoSize,
+    photoShape, setPhotoShape,
+    photoBorder, setPhotoBorder,
+    customPhoto, setCustomPhoto, resetPhoto,
   } = useResume();
   
   const [copiedResume, setCopiedResume] = useState(false);
@@ -145,7 +162,7 @@ ${auditBlockResume}
 - Do NOT invent any experience, tools, certifications, or metrics
 - Ensure job titles, company names, and dates remain exactly as provided
 - ALL company experiences MUST be presented in bullet-point format (-)
-- The resume title/headline (the second line, directly below the candidate's name) MUST exactly match the target job title from the job description — update it every time
+- The position title/headline MUST use ### (h3 markdown heading) and MUST exactly match the target job title from the job description — update it every time. Structure the resume header as: # Candidate Name [blank line] ### Job Title [blank line] contact info on its own paragraph.
 - Ensure all year/duration ranges are wrapped in parentheses — e.g. (2021 – 2023), (2025 – Present)
 - EDUCATION & CERTIFICATIONS — copy these sections VERBATIM from the source resume. Do NOT reword, reorder, abbreviate, or add anything. The degree names, institution names, and year ranges must appear character-for-character exactly as they are in the resume provided. CRITICAL: year ranges in the Education section use parentheses — e.g. (2016 - 2020) — preserve this format exactly, do NOT strip or reformat the parentheses
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
@@ -173,7 +190,7 @@ ${auditBlockResume}
 - Do NOT remove any sections
 - Keep the output in the same Markdown format
 - ALL company experiences MUST be presented in bullet-point format (-)
-- The resume title/headline (the second line, directly below the candidate's name) MUST exactly match the target job title from the job description — update it every time
+- The position title/headline MUST use ### (h3 markdown heading) and MUST exactly match the target job title from the job description — update it every time. Structure the resume header as: # Candidate Name [blank line] ### Job Title [blank line] contact info on its own paragraph.
 - Ensure all year/duration ranges are wrapped in parentheses — e.g. (2021 – 2023), (2025 – Present)
 - EDUCATION & CERTIFICATIONS — copy these sections VERBATIM from the source resume. Do NOT reword, reorder, abbreviate, or add anything. The degree names, institution names, and year ranges must appear character-for-character exactly as they are in the resume provided. CRITICAL: year ranges in the Education section use parentheses — e.g. (2016 - 2020) — preserve this format exactly, do NOT strip or reformat the parentheses
 - Constrain the total length so the generated resume fits perfectly within two A4 pages
@@ -561,6 +578,260 @@ ${jobDescription || '[PASTE JOB DESCRIPTION HERE]'}`;
               </div>
             )}
           </div>
+
+          {/* ── Divider (before photo toggle) */}
+          <div style={{ borderTop: '1px solid var(--glass-border)', margin: '0.25rem 0' }} />
+
+          {/* ── Include Profile Photo toggle ── */}
+          <div className="flex items-center justify-between px-1">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className="text-sm font-semibold transition-colors duration-300"
+                  style={{ color: includePhoto ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--text-primary)' }}
+                >
+                  Include Profile Photo
+                </span>
+                {/* ATS warning badge */}
+                {mode === 'ats' && (
+                  <span style={{
+                    fontSize: '9px', fontWeight: 800, padding: '1px 7px',
+                    borderRadius: '999px', background: 'rgba(217,119,6,0.12)',
+                    color: '#b45309', border: '1px solid rgba(217,119,6,0.25)',
+                    letterSpacing: '0.04em', textTransform: 'uppercase'
+                  }}>
+                    Human-reader only
+                  </span>
+                )}
+                {/* Revert button — shown when photo is on */}
+                {includePhoto && (
+                  <button
+                    onClick={() => setIncludePhoto(false)}
+                    className="btn h-5 px-2 text-[9px] transition-all duration-200"
+                    style={{
+                      background: 'var(--bg-primary)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-muted)',
+                      borderRadius: '6px',
+                    }}
+                    title="Remove photo from preview"
+                  >
+                    <Image size={9} />
+                    <span>Revert</span>
+                  </button>
+                )}
+              </div>
+              <span className="text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>
+                Adds your headshot to the top-right of the resume preview &amp; PDF export.
+                {mode === 'ats' && ' ATS scanners ignore images — only enable for human reviewers.'}
+              </span>
+            </div>
+            <button
+              onClick={() => setIncludePhoto(v => !v)}
+              className="relative flex items-center h-6 rounded-full w-11 transition-all duration-300 focus:outline-none shrink-0"
+              style={{
+                background: includePhoto ? (mode === 'ats' ? 'var(--emerald)' : 'var(--accent)') : 'var(--border)',
+              }}
+            >
+              <span
+                className={clsx('inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-300 shadow-md', includePhoto ? 'translate-x-6' : 'translate-x-1')}
+              />
+            </button>
+          </div>
+
+          {/* ── Photo Customization Controls (Size, Shape, Border) ── */}
+          {includePhoto && (
+            <div
+              className="mt-3.5 p-4 rounded-xl flex flex-col gap-4 transition-all duration-300"
+              style={{
+                background: 'var(--bg-primary)',
+                border: '1px solid var(--border)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+              }}
+            >
+              {/* Photo Source & Upload Row */}
+              <div className="flex items-center justify-between pb-3.5 border-b" style={{ borderColor: 'var(--border)' }}>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={customPhoto || defaultProfilePhoto}
+                    alt="Active Profile"
+                    className="w-10 h-10 rounded-lg object-cover border shadow-sm"
+                    style={{ borderColor: 'var(--border)' }}
+                  />
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[12px] font-bold" style={{ color: 'var(--text-primary)' }}>
+                        {customPhoto ? 'Custom Photo' : 'Default Headshot'}
+                      </span>
+                      {customPhoto && (
+                        <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                      {customPhoto ? 'Custom image loaded' : 'Current photo (profile.jpg)'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={photoInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => photoInputRef.current?.click()}
+                    className="h-8 px-3 text-[11px] font-semibold flex items-center gap-1.5 rounded-lg transition-all duration-200 active:scale-95 shadow-sm"
+                    style={{
+                      background: 'var(--bg-tertiary)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-primary)',
+                    }}
+                    title="Upload a new photo"
+                  >
+                    <Upload size={13} />
+                    <span>Upload</span>
+                  </button>
+
+                  {customPhoto && (
+                    <button
+                      type="button"
+                      onClick={resetPhoto}
+                      className="h-8 px-2.5 text-[11px] font-semibold flex items-center gap-1 rounded-lg transition-all duration-200 active:scale-95 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10"
+                      style={{
+                        background: 'var(--bg-tertiary)',
+                        border: '1px solid var(--border)',
+                      }}
+                      title="Reset to current default photo"
+                    >
+                      <RotateCcw size={12} />
+                      <span>Reset</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Size Option (Bottom-anchored, expands upwards & leftwards) */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Photo Size</span>
+                  <span className="text-[10px] font-medium px-2.5 py-0.5 rounded-full" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}>
+                    {photoSize === 'sm' && 'Compact (36pt)'}
+                    {photoSize === 'md' && 'Exact Fit (42pt)'}
+                    {photoSize === 'lg' && 'Large (50pt)'}
+                    {photoSize === 'xl' && 'Extra Large (58pt)'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-1.5 p-1.5 rounded-xl" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border)' }}>
+                  {[
+                    { id: 'sm', label: 'S', hint: '36pt' },
+                    { id: 'md', label: 'M', hint: '42pt' },
+                    { id: 'lg', label: 'L', hint: '50pt' },
+                    { id: 'xl', label: 'XL', hint: '58pt' },
+                  ].map(s => {
+                    const isSelected = photoSize === s.id;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => setPhotoSize(s.id)}
+                        className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg text-xs font-bold transition-all duration-200 active:scale-95 ${
+                          isSelected ? 'text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5'
+                        }`}
+                        style={{
+                          background: isSelected
+                            ? (mode === 'ats' ? 'linear-gradient(135deg, #059669 0%, #0d9488 100%)' : 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)')
+                            : 'transparent',
+                          boxShadow: isSelected
+                            ? (mode === 'ats' ? '0 2px 8px rgba(5, 150, 105, 0.35)' : '0 2px 8px rgba(124, 58, 237, 0.35)')
+                            : 'none',
+                        }}
+                      >
+                        <span className="leading-tight">{s.label}</span>
+                        <span className={`text-[9px] font-medium leading-none mt-1 ${isSelected ? 'text-white/80' : 'text-slate-400 dark:text-slate-500'}`}>{s.hint}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Shape Option */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Shape</span>
+                <div className="grid grid-cols-4 gap-1.5 p-1.5 rounded-xl" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border)' }}>
+                  {[
+                    { id: 'rounded', label: 'Rounded', radius: 'rounded-[3px]' },
+                    { id: 'squircle', label: 'Squircle', radius: 'rounded-[6px]' },
+                    { id: 'circle', label: 'Circle', radius: 'rounded-full' },
+                    { id: 'square', label: 'Square', radius: 'rounded-none' },
+                  ].map(sh => {
+                    const isSelected = photoShape === sh.id;
+                    return (
+                      <button
+                        key={sh.id}
+                        type="button"
+                        onClick={() => setPhotoShape(sh.id)}
+                        className={`flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-[11px] font-semibold transition-all duration-200 active:scale-95 ${
+                          isSelected ? 'text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5'
+                        }`}
+                        style={{
+                          background: isSelected
+                            ? (mode === 'ats' ? 'linear-gradient(135deg, #059669 0%, #0d9488 100%)' : 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)')
+                            : 'transparent',
+                          boxShadow: isSelected
+                            ? (mode === 'ats' ? '0 2px 8px rgba(5, 150, 105, 0.35)' : '0 2px 8px rgba(124, 58, 237, 0.35)')
+                            : 'none',
+                        }}
+                      >
+                        <span className={`inline-block w-2.5 h-2.5 border ${sh.radius} ${isSelected ? 'border-white bg-white/20' : 'border-current'}`} />
+                        <span>{sh.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Boundary / Border Option */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Boundary</span>
+                <div className="grid grid-cols-3 gap-1.5 p-1.5 rounded-xl" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border)' }}>
+                  {[
+                    { id: 'subtle', label: 'Border', desc: 'Frame' },
+                    { id: 'none', label: 'Borderless', desc: 'Clean' },
+                    { id: 'accent', label: 'Accent', desc: 'Colored' },
+                  ].map(b => {
+                    const isSelected = photoBorder === b.id;
+                    return (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => setPhotoBorder(b.id)}
+                        className={`flex flex-col items-center justify-center py-2.5 px-3 rounded-lg text-[11px] font-semibold transition-all duration-200 active:scale-95 ${
+                          isSelected ? 'text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5'
+                        }`}
+                        style={{
+                          background: isSelected
+                            ? (mode === 'ats' ? 'linear-gradient(135deg, #059669 0%, #0d9488 100%)' : 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)')
+                            : 'transparent',
+                          boxShadow: isSelected
+                            ? (mode === 'ats' ? '0 2px 8px rgba(5, 150, 105, 0.35)' : '0 2px 8px rgba(124, 58, 237, 0.35)')
+                            : 'none',
+                        }}
+                      >
+                        <span className="leading-tight">{b.label}</span>
+                        <span className={`text-[9px] font-medium leading-none mt-1 ${isSelected ? 'text-white/80' : 'text-slate-400 dark:text-slate-500'}`}>{b.desc}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

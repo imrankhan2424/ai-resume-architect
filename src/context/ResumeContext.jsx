@@ -33,6 +33,21 @@ export const ResumeProvider = ({ children }) => {
   const [jobDescription, setJobDescription] = useState('');
   const [aiResult, setAiResult] = useState('');
   const [includeCoverLetter, setIncludeCoverLetter] = useState(false);
+  const [includePhoto, setIncludePhoto] = useState(() =>
+    localStorage.getItem('resume-include-photo') === 'true'
+  );
+  const [photoSize, setPhotoSize] = useState(() =>
+    localStorage.getItem('resume-photo-size') || 'md'
+  );
+  const [photoShape, setPhotoShape] = useState(() =>
+    localStorage.getItem('resume-photo-shape') || 'rounded'
+  );
+  const [photoBorder, setPhotoBorder] = useState(() =>
+    localStorage.getItem('resume-photo-border') || 'subtle'
+  );
+  const [customPhoto, setCustomPhoto] = useState(() => {
+    return localStorage.getItem('resume-custom-photo') || null;
+  });
   
   // NEW: Lead Hub State
   const [includeLeadExtraction, setIncludeLeadExtraction] = useState(() => {
@@ -65,6 +80,34 @@ export const ResumeProvider = ({ children }) => {
   }, [includeLeadExtraction]);
 
   useEffect(() => {
+    localStorage.setItem('resume-include-photo', String(includePhoto));
+  }, [includePhoto]);
+
+  useEffect(() => {
+    localStorage.setItem('resume-photo-size', photoSize);
+  }, [photoSize]);
+
+  useEffect(() => {
+    localStorage.setItem('resume-photo-shape', photoShape);
+  }, [photoShape]);
+
+  useEffect(() => {
+    localStorage.setItem('resume-photo-border', photoBorder);
+  }, [photoBorder]);
+
+  useEffect(() => {
+    if (customPhoto) {
+      try {
+        localStorage.setItem('resume-custom-photo', customPhoto);
+      } catch (e) {
+        console.warn('Custom photo too large for localStorage', e);
+      }
+    } else {
+      localStorage.removeItem('resume-custom-photo');
+    }
+  }, [customPhoto]);
+
+  useEffect(() => {
     localStorage.setItem('resume-contacts', JSON.stringify(contacts));
   }, [contacts]);
 
@@ -84,6 +127,10 @@ export const ResumeProvider = ({ children }) => {
     setContacts(prev => prev.filter(c => c.id !== id));
   };
 
+  const resetPhoto = () => {
+    setCustomPhoto(null);
+  };
+
   return (
     <ResumeContext.Provider value={{
       theme, setTheme,
@@ -95,7 +142,12 @@ export const ResumeProvider = ({ children }) => {
       includeLeadExtraction, setIncludeLeadExtraction,
       aiCoverLetterResult, setAiCoverLetterResult,
       leadAiResult, setLeadAiResult,
-      contacts, setContacts, addContact, removeContact
+      contacts, setContacts, addContact, removeContact,
+      includePhoto, setIncludePhoto,
+      photoSize, setPhotoSize,
+      photoShape, setPhotoShape,
+      photoBorder, setPhotoBorder,
+      customPhoto, setCustomPhoto, resetPhoto,
     }}>
       {children}
     </ResumeContext.Provider>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import profilePhoto from '../assets/profile.jpg';
 import ReactMarkdown from 'react-markdown';
 import { createPortal, flushSync } from 'react-dom';
 import { Printer, Edit3, Settings, ShieldCheck, FileText, Copy, Check, Maximize2, X, UserPlus, Mail, MapPin, Building, UserCheck, Trash2 } from 'lucide-react';
@@ -9,7 +10,12 @@ const PDFExport = () => {
     mode, aiResult, setAiResult, 
     includeCoverLetter, aiCoverLetterResult, setAiCoverLetterResult,
     includeLeadExtraction, leadAiResult, setLeadAiResult,
-    addContact
+    addContact,
+    includePhoto,
+    photoSize,
+    photoShape,
+    photoBorder,
+    customPhoto,
   } = useResume();
 
   const [printTarget, setPrintTarget] = React.useState('both');
@@ -20,6 +26,20 @@ const PDFExport = () => {
   const [copiedLead, setCopiedLead] = useState(false);
   const [modalTarget, setModalTarget] = useState(null); // 'resume' | 'cover' | null
   const [customFileName, setCustomFileName] = useState('');
+
+  const PHOTO_SIZES = { sm: '36pt', md: '42pt', lg: '50pt', xl: '58pt' };
+  const PHOTO_SHAPES = { rounded: '6px', squircle: '14px', circle: '9999px', square: '0px' };
+  const PHOTO_BORDERS = {
+    subtle: '1.5px solid #ede9fe',
+    none: 'none',
+    accent: mode === 'ats' ? '2px solid #059669' : '2px solid #7c3aed',
+  };
+
+  const activePhotoSize = PHOTO_SIZES[photoSize] || '42pt';
+  const activePhotoRadius = PHOTO_SHAPES[photoShape] || '6px';
+  const activePhotoBorder = PHOTO_BORDERS[photoBorder] || '1.5px solid #ede9fe';
+  const activePhotoSrc = customPhoto || profilePhoto;
+  const activePhotoShadow = photoBorder === 'none' ? 'none' : '0 2px 10px rgba(109,40,217,0.12), 0 1px 3px rgba(0,0,0,0.08)';
 
   const handlePrint = (target, styleOverride = null) => {
     flushSync(() => {
@@ -293,8 +313,16 @@ const PDFExport = () => {
           </div>
           <button onClick={() => setModalTarget('resume')} className="absolute top-6 right-6 z-20 w-8 h-8 rounded-lg bg-white/90 backdrop-blur-md border shadow-md flex items-center justify-center opacity-90 transition-all duration-300 hover:scale-110 hover:opacity-100 no-print text-[var(--emerald)]" style={{ borderColor: 'var(--border)' }}><Maximize2 size={15} /></button>
           <div className="glass-card overflow-hidden print-preview-wrapper" style={{ padding: 'clamp(0.75rem, 2vw, 2rem)', background: 'rgba(0,0,0,0.06)' }}>
-            <div id="resume-print-area" className={`print-resume shadow-2xl w-full mx-auto overflow-hidden transition-all duration-500 bg-white text-black ${effectivePrintMode === 'ats' ? 'font-serif' : 'font-sans'}`} style={{ maxWidth: '8.5in', minHeight: '11in' }}>
-              <div style={{ padding: 'clamp(0.4in, 3vw, 0.7in)', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
+            <div id="resume-print-area" className={`print-resume resume-sheet shadow-2xl w-full mx-auto overflow-hidden transition-all duration-500 bg-white text-black ${effectivePrintMode === 'ats' ? 'font-serif' : 'font-sans'}`} style={{ maxWidth: '8.5in', minHeight: '11in', position: 'relative' }}>
+              {/* ── Profile Photo Overlay ── */}
+              {includePhoto && (
+                <img
+                  src={activePhotoSrc}
+                  alt="Profile"
+                  className="profile-photo-overlay"
+                />
+              )}
+              <div className="resume-content-pad">
                 <ReactMarkdown className="markdown-render">{aiResult || '### Layout Preview\nYour generated content will render here.'}</ReactMarkdown>
               </div>
             </div>
@@ -318,15 +346,25 @@ const PDFExport = () => {
               <button onClick={() => setModalTarget(null)} className="w-8 h-8 rounded-xl flex items-center justify-center border hover:bg-gray-100 transition-colors text-black"><X size={14} /></button>
             </div>
             <div className="flex-1 overflow-y-auto overflow-x-auto p-4 sm:p-8 flex flex-col items-center" style={{ background: 'rgba(0,0,0,0.04)' }}>
-              <div className={`shrink-0 shadow-2xl w-full mx-auto bg-white text-black ${effectivePrintMode === 'ats' ? 'font-serif' : 'font-sans'}`} style={{ maxWidth: '8.5in', minHeight: '11in' }}>
+              <div className={`shrink-0 resume-sheet shadow-2xl w-full mx-auto bg-white text-black ${effectivePrintMode === 'ats' ? 'font-serif' : 'font-sans'}`} style={{ maxWidth: '8.5in', minHeight: '11in', position: 'relative' }}>
                  {modalTarget === 'cover' ? (
                    <div style={{ padding: 'clamp(0.5in, 4vw, 0.85in)' }}>
                      <ReactMarkdown className="cover-letter-render">{aiCoverLetterResult}</ReactMarkdown>
                    </div>
                  ) : (
-                   <div style={{ padding: 'clamp(0.4in, 3vw, 0.7in)' }}>
-                     <ReactMarkdown className="markdown-render">{aiResult}</ReactMarkdown>
-                   </div>
+                   <>
+                     {/* ── Profile Photo in modal ── */}
+                     {includePhoto && (
+                       <img
+                         src={activePhotoSrc}
+                         alt="Profile"
+                         className="profile-photo-overlay"
+                       />
+                     )}
+                     <div className="resume-content-pad">
+                       <ReactMarkdown className="markdown-render">{aiResult}</ReactMarkdown>
+                     </div>
+                   </>
                  )}
               </div>
             </div>
@@ -346,10 +384,41 @@ const PDFExport = () => {
         input:checked + .slider { background-color: var(--emerald); }
         input:checked + .slider:before { transform: translateX(14px); }
         .print-resume { font-variant-ligatures: common-ligatures; text-rendering: optimizeLegibility; border-radius: 0.5rem; }
+        
+        .resume-sheet {
+          --resume-pad: clamp(0.4in, 3.2vw, 0.65in);
+          --photo-size: ${activePhotoSize};
+          --photo-radius: ${activePhotoRadius};
+          --photo-border: ${activePhotoBorder};
+          --photo-shadow: ${activePhotoShadow};
+        }
+        .resume-sheet .resume-content-pad {
+          padding: var(--resume-pad);
+          box-decoration-break: clone;
+          -webkit-box-decoration-break: clone;
+        }
+        .resume-sheet .profile-photo-overlay {
+          position: absolute;
+          top: calc(var(--resume-pad) + 40.5pt - var(--photo-size));
+          right: var(--resume-pad);
+          width: var(--photo-size);
+          height: var(--photo-size);
+          border-radius: var(--photo-radius);
+          border: var(--photo-border);
+          box-shadow: var(--photo-shadow);
+          object-fit: cover;
+          object-position: center top;
+          z-index: 10;
+          display: block;
+          transform-origin: bottom right;
+          transition: width 0.2s ease, height 0.2s ease, top 0.2s ease, border-radius 0.2s ease;
+        }
+
         .markdown-render { color: #1e1b4b; }
-        .markdown-render h1 { font-size: 24pt; margin-bottom: 2pt; line-height: 1.1; font-weight: 800; color: #1e1b4b; }
+        .markdown-render h1 { font-size: 24pt; margin-top: 0; margin-bottom: 2pt; line-height: 1.1; font-weight: 800; color: #1e1b4b; }
         .markdown-render h2 { font-size: 11pt; border-bottom: 1.5px solid #ede9fe; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 4pt; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: #4c1d95; }
         .markdown-render h3 { font-size: 10.5pt; margin-top: 8pt; margin-bottom: 1pt; font-weight: 700; color: #1e1b4b; }
+        .markdown-render h1 + h3 { margin-top: 2pt; margin-bottom: 2pt; line-height: 1.3; }
         .markdown-render p { font-size: 9.5pt; margin-bottom: 4pt; color: #374151; line-height: 1.5; }
         .markdown-render ul { margin-bottom: 6pt; padding-left: 14pt; list-style-type: disc; }
         .markdown-render li { font-size: 9.5pt; margin-bottom: 2pt; color: #374151; line-height: 1.45; }
@@ -358,6 +427,7 @@ const PDFExport = () => {
         .cover-letter-render h1 { font-size: 20pt; font-weight: 800; color: #0f172a; margin: 0 0 4pt 0; }
         .cover-letter-render p { font-size: 10.5pt; margin-bottom: 10pt; color: #374151; line-height: 1.75; }
         .cover-letter-render hr { border: none; border-top: 1.5px solid #e2e8f0; margin: 12pt 0; }
+        
         @media print {
           @page { size: A4; margin: 0; }
           header, .app-bg, .no-print { display: none !important; }
@@ -365,7 +435,43 @@ const PDFExport = () => {
           .main-grid { display: block !important; }
           .main-grid > div:last-child { display: block !important; }
           .print-preview-wrapper { background: transparent !important; border: none !important; padding: 0 !important; box-shadow: none !important; }
-          #resume-print-area, #cover-letter-print-area { width: 100% !important; max-width: none !important; min-height: auto !important; box-shadow: none !important; border-radius: 0 !important; transform: none !important; margin: 0 !important; background: white !important; }
+          
+          #resume-print-area, #cover-letter-print-area {
+            width: 100% !important;
+            max-width: none !important;
+            min-height: auto !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            transform: none !important;
+            margin: 0 !important;
+            background: white !important;
+          }
+          
+          .resume-sheet {
+            --resume-pad: 0.5in !important;
+            --photo-size: ${activePhotoSize} !important;
+            --photo-radius: ${activePhotoRadius} !important;
+            --photo-border: ${activePhotoBorder} !important;
+            --photo-shadow: ${activePhotoShadow} !important;
+          }
+          .resume-sheet .resume-content-pad {
+            padding: 0.5in !important;
+          }
+          .resume-sheet .profile-photo-overlay {
+            position: absolute !important;
+            top: calc(0.5in + 40.5pt - var(--photo-size)) !important;
+            right: 0.5in !important;
+            width: var(--photo-size) !important;
+            height: var(--photo-size) !important;
+            border-radius: var(--photo-radius) !important;
+            border: var(--photo-border) !important;
+            box-shadow: var(--photo-shadow) !important;
+            object-fit: cover !important;
+            transform-origin: bottom right !important;
+            print-color-adjust: exact !important;
+            -webkit-print-color-adjust: exact !important;
+          }
+          
           .preview-cover-letter-container { page-break-after: always; }
           div[data-print-target="resume"] .preview-cover-letter-container { display: none !important; }
           div[data-print-target="cover-letter"] .preview-resume-container { display: none !important; }
